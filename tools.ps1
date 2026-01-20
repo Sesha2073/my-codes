@@ -1,12 +1,14 @@
 function get-code {
     param([string]$file)
 
-    # --- CONFIGURATION: EDIT THIS PART ---
-    $githubUser = "YOUR_USERNAME"
-    $repoName   = "YOUR_REPO_NAME"
+    # --- CORRECTED CONFIGURATION ---
+    # We define the names here (No '$' inside the quotes)
+    $githubUser = "Sesha2073"
+    $repoName   = "my-codes"
     $branch     = "main"   
-    # -------------------------------------
+    # -------------------------------
 
+    # PowerShell automatically puts those names into this URL
     $baseUrl = "https://raw.githubusercontent.com/$githubUser/$repoName/$branch/"
 
     if ([string]::IsNullOrWhiteSpace($file)) {
@@ -18,16 +20,15 @@ function get-code {
     $url = "$baseUrl$file"
 
     try {
-        # This downloads the raw text safely (even HTML)
         $response = Invoke-WebRequest -Uri $url -UseBasicParsing -ErrorAction Stop
         
         Write-Host "`n--- START OF $file ---`n" -ForegroundColor Cyan
-        # Print the raw code to the screen
         Write-Output $response.Content
         Write-Host "`n--- END OF $file ---`n" -ForegroundColor Cyan
     }
     catch {
-        Write-Host "⚠️ Error: Could not find '$file'. Check the spelling." -ForegroundColor Red
+        Write-Host "⚠️ Error: Could not find '$file' in $url" -ForegroundColor Red
+        Write-Host "Check if the file exists in your GitHub repo or if the repo is Public." -ForegroundColor Gray
     }
 }
 
