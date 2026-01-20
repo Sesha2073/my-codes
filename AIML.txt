@@ -1,0 +1,231 @@
+# =========================
+# Program 1(a): Breadth First Search (BFS)
+# =========================
+from collections import deque
+
+class GraphBFS:
+    def __init__(self, directed=True):
+        self.edges = {}
+        self.directed = directed
+
+    def add_edge(self, node1, node2, reversed=False):
+        if node1 not in self.edges:
+            self.edges[node1] = set()
+        self.edges[node1].add(node2)
+        if not self.directed and not reversed:
+            self.add_edge(node2, node1, True)
+
+    def neighbors(self, node):
+        return self.edges.get(node, [])
+
+    def breadth_first_search(self, start, goal):
+        found = False
+        fringe = deque([start])
+        visited = set([start])
+        came_from = {start: None}
+
+        print('{:11s} | {}'.format('Expand Node', 'Fringe'))
+        print('{:11s} | {}'.format('-', start))
+
+        while not found and fringe:
+            current = fringe.pop()
+            print('{:11s}'.format(current), end=' | ')
+            if current == goal:
+                found = True
+                break
+            for node in self.neighbors(current):
+                if node not in visited:
+                    visited.add(node)
+                    fringe.appendleft(node)
+                    came_from[node] = current
+            print(', '.join(fringe))
+
+        if found:
+            print()
+            return came_from
+        else:
+            print(f'No path from {start} to {goal}')
+            return None
+
+    @staticmethod
+    def print_path(came_from, goal):
+        parent = came_from[goal]
+        if parent:
+            GraphBFS.print_path(came_from, parent)
+        else:
+            print(goal, end='')
+            return
+        print(' =>', goal, end='')
+
+
+graph_bfs = GraphBFS(directed=False)
+graph_bfs.add_edge('A', 'B')
+graph_bfs.add_edge('A', 'S')
+graph_bfs.add_edge('S', 'G')
+graph_bfs.add_edge('S', 'C')
+graph_bfs.add_edge('C', 'F')
+graph_bfs.add_edge('G', 'F')
+graph_bfs.add_edge('C', 'D')
+graph_bfs.add_edge('C', 'E')
+graph_bfs.add_edge('E', 'H')
+graph_bfs.add_edge('G', 'H')
+
+start, goal = 'A', 'H'
+path_bfs = graph_bfs.breadth_first_search(start, goal)
+if path_bfs:
+    print('Path:', end=' ')
+    GraphBFS.print_path(path_bfs, goal)
+    print()
+
+
+# =========================
+# Program 1(b): Depth First Search (DFS)
+# =========================
+from collections import deque
+
+class GraphDFS:
+    def __init__(self, directed=True):
+        self.edges = {}
+        self.directed = directed
+
+    def add_edge(self, node1, node2, reversed=False):
+        if node1 not in self.edges:
+            self.edges[node1] = set()
+        self.edges[node1].add(node2)
+        if not self.directed and not reversed:
+            self.add_edge(node2, node1, True)
+
+    def neighbors(self, node):
+        return self.edges.get(node, [])
+
+    def depth_first_search(self, start, goal):
+        found = False
+        fringe = deque([start])
+        visited = set([start])
+        came_from = {start: None}
+
+        print('{:11s} | {}'.format('Expand Node', 'Fringe'))
+        print('{:11s} | {}'.format('-', start))
+
+        while not found and fringe:
+            current = fringe.pop()
+            print('{:11s}'.format(current), end=' | ')
+            if current == goal:
+                found = True
+                break
+            for node in self.neighbors(current):
+                if node not in visited:
+                    visited.add(node)
+                    fringe.append(node)
+                    came_from[node] = current
+            print(', '.join(fringe))
+
+        if found:
+            print()
+            return came_from
+        else:
+            print(f'No path from {start} to {goal}')
+            return None
+
+    @staticmethod
+    def print_path(came_from, goal):
+        parent = came_from[goal]
+        if parent:
+            GraphDFS.print_path(came_from, parent)
+        else:
+            print(goal, end='')
+            return
+        print(' =>', goal, end='')
+
+
+graph_dfs = GraphDFS(directed=False)
+graph_dfs.add_edge('A', 'B')
+graph_dfs.add_edge('A', 'S')
+graph_dfs.add_edge('S', 'G')
+graph_dfs.add_edge('S', 'C')
+graph_dfs.add_edge('C', 'F')
+graph_dfs.add_edge('G', 'F')
+graph_dfs.add_edge('C', 'D')
+graph_dfs.add_edge('C', 'E')
+graph_dfs.add_edge('E', 'H')
+graph_dfs.add_edge('G', 'H')
+
+start, goal = 'A', 'H'
+path_dfs = graph_dfs.depth_first_search(start, goal)
+if path_dfs:
+    print('Path:', end=' ')
+    GraphDFS.print_path(path_dfs, goal)
+    print()
+
+
+# =========================
+# Program 2(a): A* Search Algorithm
+# =========================
+
+def aStarAlgo(start_node, stop_node):
+    open_set = {start_node}
+    closed_set = set()
+    g = {start_node: 0}
+    parents = {start_node: start_node}
+
+    while open_set:
+        n = None
+        for v in open_set:
+            if n is None or g[v] + heuristic(v) < g[n] + heuristic(n):
+                n = v
+
+        if n == stop_node:
+            path = []
+            while parents[n] != n:
+                path.append(n)
+                n = parents[n]
+            path.append(start_node)
+            path.reverse()
+            print('Path found:', path)
+            return path
+
+        for (m, weight) in get_neighbors(n):
+            if m not in open_set and m not in closed_set:
+                open_set.add(m)
+                parents[m] = n
+                g[m] = g[n] + weight
+            else:
+                if g[m] > g[n] + weight:
+                    g[m] = g[n] + weight
+                    parents[m] = n
+                    if m in closed_set:
+                        closed_set.remove(m)
+                        open_set.add(m)
+
+        open_set.remove(n)
+        closed_set.add(n)
+
+    print('Path does not exist!')
+    return None
+
+
+def get_neighbors(v):
+    return Graph_nodes.get(v, [])
+
+
+def heuristic(n):
+    H_dist = {
+        'A': 10, 'B': 8, 'C': 5, 'D': 7, 'E': 3,
+        'F': 6, 'G': 5, 'H': 3, 'I': 1, 'J': 0
+    }
+    return H_dist[n]
+
+
+Graph_nodes = {
+    'A': [('B', 6), ('F', 3)],
+    'B': [('C', 3), ('D', 2)],
+    'C': [('D', 1), ('E', 5)],
+    'D': [('C', 1), ('E', 8)],
+    'E': [('I', 5), ('J', 5)],
+    'F': [('G', 1), ('H', 7)],
+    'G': [('I', 3)],
+    'H': [('I', 2)],
+    'I': [('E', 5), ('J', 3)]
+}
+
+aStarAlgo('A', 'J')
