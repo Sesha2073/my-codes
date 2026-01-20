@@ -1,6 +1,4 @@
-# =========================
-# Program 1(a): Breadth First Search (BFS)
-# =========================
+# ===== Program 1(a): Breadth-First Search (BFS) =====
 from collections import deque
 
 class GraphBFS:
@@ -10,8 +8,9 @@ class GraphBFS:
 
     def add_edge(self, node1, node2, reversed=False):
         if node1 not in self.edges:
-            self.edges[node1] = set()
-        self.edges[node1].add(node2)
+            self.edges[node1] = []
+        if node2 not in self.edges[node1]:
+            self.edges[node1].append(node2)
         if not self.directed and not reversed:
             self.add_edge(node2, node1, True)
 
@@ -19,96 +18,20 @@ class GraphBFS:
         return self.edges.get(node, [])
 
     def breadth_first_search(self, start, goal):
-        found = False
-        fringe = deque([start])
-        visited = set([start])
+        if start == goal:
+            print("Start is goal:", start)
+            return {start: None}
+
+        fringe = deque([start])           # FIFO queue
+        visited = {start}
         came_from = {start: None}
+        found = False
 
         print('{:11s} | {}'.format('Expand Node', 'Fringe'))
         print('{:11s} | {}'.format('-', start))
 
-        while not found and fringe:
-            current = fringe.pop()
-            print('{:11s}'.format(current), end=' | ')
-            if current == goal:
-                found = True
-                break
-            for node in self.neighbors(current):
-                if node not in visited:
-                    visited.add(node)
-                    fringe.appendleft(node)
-                    came_from[node] = current
-            print(', '.join(fringe))
-
-        if found:
-            print()
-            return came_from
-        else:
-            print(f'No path from {start} to {goal}')
-            return None
-
-    @staticmethod
-    def print_path(came_from, goal):
-        parent = came_from[goal]
-        if parent:
-            GraphBFS.print_path(came_from, parent)
-        else:
-            print(goal, end='')
-            return
-        print(' =>', goal, end='')
-
-
-graph_bfs = GraphBFS(directed=False)
-graph_bfs.add_edge('A', 'B')
-graph_bfs.add_edge('A', 'S')
-graph_bfs.add_edge('S', 'G')
-graph_bfs.add_edge('S', 'C')
-graph_bfs.add_edge('C', 'F')
-graph_bfs.add_edge('G', 'F')
-graph_bfs.add_edge('C', 'D')
-graph_bfs.add_edge('C', 'E')
-graph_bfs.add_edge('E', 'H')
-graph_bfs.add_edge('G', 'H')
-
-start, goal = 'A', 'H'
-path_bfs = graph_bfs.breadth_first_search(start, goal)
-if path_bfs:
-    print('Path:', end=' ')
-    GraphBFS.print_path(path_bfs, goal)
-    print()
-
-
-# =========================
-# Program 1(b): Depth First Search (DFS)
-# =========================
-from collections import deque
-
-class GraphDFS:
-    def __init__(self, directed=True):
-        self.edges = {}
-        self.directed = directed
-
-    def add_edge(self, node1, node2, reversed=False):
-        if node1 not in self.edges:
-            self.edges[node1] = set()
-        self.edges[node1].add(node2)
-        if not self.directed and not reversed:
-            self.add_edge(node2, node1, True)
-
-    def neighbors(self, node):
-        return self.edges.get(node, [])
-
-    def depth_first_search(self, start, goal):
-        found = False
-        fringe = deque([start])
-        visited = set([start])
-        came_from = {start: None}
-
-        print('{:11s} | {}'.format('Expand Node', 'Fringe'))
-        print('{:11s} | {}'.format('-', start))
-
-        while not found and fringe:
-            current = fringe.pop()
+        while fringe and not found:
+            current = fringe.popleft()
             print('{:11s}'.format(current), end=' | ')
             if current == goal:
                 found = True
@@ -118,8 +41,8 @@ class GraphDFS:
                     visited.add(node)
                     fringe.append(node)
                     came_from[node] = current
+            # print fringe contents as comma-separated
             print(', '.join(fringe))
-
         if found:
             print()
             return came_from
@@ -129,52 +52,151 @@ class GraphDFS:
 
     @staticmethod
     def print_path(came_from, goal):
+        if goal not in came_from:
+            print(f'(no path to {goal})', end='')
+            return
         parent = came_from[goal]
-        if parent:
-            GraphDFS.print_path(came_from, parent)
-        else:
+        if parent is None:
             print(goal, end='')
             return
+        GraphBFS.print_path(came_from, parent)
         print(' =>', goal, end='')
 
 
-graph_dfs = GraphDFS(directed=False)
-graph_dfs.add_edge('A', 'B')
-graph_dfs.add_edge('A', 'S')
-graph_dfs.add_edge('S', 'G')
-graph_dfs.add_edge('S', 'C')
-graph_dfs.add_edge('C', 'F')
-graph_dfs.add_edge('G', 'F')
-graph_dfs.add_edge('C', 'D')
-graph_dfs.add_edge('C', 'E')
-graph_dfs.add_edge('E', 'H')
-graph_dfs.add_edge('G', 'H')
+# Example usage for BFS
+if __name__ == "__main__" and __name__ == "__main__":
+    graph_bfs = GraphBFS(directed=False)
+    graph_bfs.add_edge('A', 'B')
+    graph_bfs.add_edge('A', 'S')
+    graph_bfs.add_edge('S', 'G')
+    graph_bfs.add_edge('S', 'C')
+    graph_bfs.add_edge('C', 'F')
+    graph_bfs.add_edge('G', 'F')
+    graph_bfs.add_edge('C', 'D')
+    graph_bfs.add_edge('C', 'E')
+    graph_bfs.add_edge('E', 'H')
+    graph_bfs.add_edge('G', 'H')
 
-start, goal = 'A', 'H'
-path_dfs = graph_dfs.depth_first_search(start, goal)
-if path_dfs:
-    print('Path:', end=' ')
-    GraphDFS.print_path(path_dfs, goal)
-    print()
+    start, goal = 'A', 'H'
+    path_bfs = graph_bfs.breadth_first_search(start, goal)
+    if path_bfs:
+        print('Path:', end=' ')
+        GraphBFS.print_path(path_bfs, goal)
+        print()
 
 
-# =========================
-# Program 2(a): A* Search Algorithm
-# =========================
+# ===== Program 1(b): Depth-First Search (DFS) =====
+class GraphDFS:
+    def __init__(self, directed=True):
+        self.edges = {}
+        self.directed = directed
 
-def aStarAlgo(start_node, stop_node):
+    def add_edge(self, node1, node2, reversed=False):
+        if node1 not in self.edges:
+            self.edges[node1] = []
+        if node2 not in self.edges[node1]:
+            self.edges[node1].append(node2)
+        if not self.directed and not reversed:
+            self.add_edge(node2, node1, True)
+
+    def neighbors(self, node):
+        return self.edges.get(node, [])
+
+    def depth_first_search(self, start, goal):
+        if start == goal:
+            print("Start is goal:", start)
+            return {start: None}
+
+        stack = [start]           # LIFO stack
+        visited = {start}
+        came_from = {start: None}
+        found = False
+
+        print('{:11s} | {}'.format('Expand Node', 'Fringe'))
+        print('{:11s} | {}'.format('-', start))
+
+        while stack and not found:
+            current = stack.pop()
+            print('{:11s}'.format(current), end=' | ')
+            if current == goal:
+                found = True
+                break
+            # push neighbors in reverse order if you want left-to-right expansion
+            for node in reversed(self.neighbors(current)):
+                if node not in visited:
+                    visited.add(node)
+                    stack.append(node)
+                    came_from[node] = current
+            print(', '.join(stack))
+        if found:
+            print()
+            return came_from
+        else:
+            print(f'No path from {start} to {goal}')
+            return None
+
+    @staticmethod
+    def print_path(came_from, goal):
+        if goal not in came_from:
+            print(f'(no path to {goal})', end='')
+            return
+        parent = came_from[goal]
+        if parent is None:
+            print(goal, end='')
+            return
+        GraphDFS.print_path(came_from, parent)
+        print(' =>', goal, end='')
+
+
+# Example usage for DFS
+if __name__ == "__main__" and False:  # set to True to run DFS demo; left False to avoid double runs
+    graph_dfs = GraphDFS(directed=False)
+    graph_dfs.add_edge('A', 'B')
+    graph_dfs.add_edge('A', 'S')
+    graph_dfs.add_edge('S', 'G')
+    graph_dfs.add_edge('S', 'C')
+    graph_dfs.add_edge('C', 'F')
+    graph_dfs.add_edge('G', 'F')
+    graph_dfs.add_edge('C', 'D')
+    graph_dfs.add_edge('C', 'E')
+    graph_dfs.add_edge('E', 'H')
+    graph_dfs.add_edge('G', 'H')
+
+    start, goal = 'A', 'H'
+    path_dfs = graph_dfs.depth_first_search(start, goal)
+    if path_dfs:
+        print('Path:', end=' ')
+        GraphDFS.print_path(path_dfs, goal)
+        print()
+
+
+# ===== Program 2(a): A* Search Algorithm =====
+def aStarAlgo(start_node, stop_node, graph_nodes, heuristic_func):
+    """
+    A* search implementation.
+    - start_node: starting node label (str)
+    - stop_node: goal node label (str)
+    - graph_nodes: dict like {'A': [('B', cost), ('C', cost)], ...}
+    - heuristic_func: function h(node) -> estimated cost to goal
+    Returns path list or None.
+    """
     open_set = {start_node}
     closed_set = set()
     g = {start_node: 0}
     parents = {start_node: start_node}
 
     while open_set:
+        # pick node in open_set with lowest f = g + h
         n = None
         for v in open_set:
-            if n is None or g[v] + heuristic(v) < g[n] + heuristic(n):
+            if n is None or g[v] + heuristic_func(v) < g[n] + heuristic_func(n):
                 n = v
 
+        if n is None:
+            break
+
         if n == stop_node:
+            # reconstruct path
             path = []
             while parents[n] != n:
                 path.append(n)
@@ -184,13 +206,16 @@ def aStarAlgo(start_node, stop_node):
             print('Path found:', path)
             return path
 
-        for (m, weight) in get_neighbors(n):
+        # expand n
+        neighbors = graph_nodes.get(n, [])
+        for (m, weight) in neighbors:
             if m not in open_set and m not in closed_set:
                 open_set.add(m)
                 parents[m] = n
                 g[m] = g[n] + weight
             else:
-                if g[m] > g[n] + weight:
+                # check if this path to m is better
+                if g.get(m, float('inf')) > g[n] + weight:
                     g[m] = g[n] + weight
                     parents[m] = n
                     if m in closed_set:
@@ -204,19 +229,16 @@ def aStarAlgo(start_node, stop_node):
     return None
 
 
-def get_neighbors(v):
-    return Graph_nodes.get(v, [])
-
-
-def heuristic(n):
+def example_heuristic(n):
     H_dist = {
         'A': 10, 'B': 8, 'C': 5, 'D': 7, 'E': 3,
         'F': 6, 'G': 5, 'H': 3, 'I': 1, 'J': 0
     }
-    return H_dist[n]
+    return H_dist.get(n, 0)
 
 
-Graph_nodes = {
+# Example graph used in lab manual
+Graph_nodes_example = {
     'A': [('B', 6), ('F', 3)],
     'B': [('C', 3), ('D', 2)],
     'C': [('D', 1), ('E', 5)],
@@ -228,4 +250,6 @@ Graph_nodes = {
     'I': [('E', 5), ('J', 3)]
 }
 
-aStarAlgo('A', 'J')
+# Example usage for A*
+if __name__ == "__main__" and __name__ == "__main__":
+    aStarAlgo('A', 'J', Graph_nodes_example, example_heuristic)
