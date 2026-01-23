@@ -1,0 +1,1870 @@
+Here is the single text file containing the programs from Exercise 2 through Exercise 16.
+
+**Notes on fixes applied:**
+*   **Shell Scripts (Ex 2):** Corrected `else if` to `elif` in shell scripts to ensure execution.
+*   **C Programs (General):** Replaced non-standard smart quotes (e.g., “ ”) with standard programming quotes (" "). Replaced MS-DOS specific headers/functions like `<conio.h>`, `clrscr()`, and `getch()` with comments or standard equivalents where necessary to ensure compilation in a Linux environment (the context of the lab).
+*   **Ex 6:** Fixed typo `pthread5_create` to `pthread_create`.
+*   **Ex 9:** Fixed undefined variable `err` to `error` to match the declaration.
+*   **Ex 15a/b/c:** Fixed OCR scanning errors such as `t*i+` to `t[i]` and removed extraneous characters like `'` inside `scanf`.
+
+```text
+===========================================================
+Ex. No: 2b - Shell Programming (Greet)
+Source:
+===========================================================
+echo "please enter your name:"
+read name
+echo "hi! Welcome to this session $name"
+
+===========================================================
+Ex. No: 2c - Shell Program to check even or odd number
+Source:
+===========================================================
+echo "enter the number"
+read num
+if [ `expr $num % 2` -eq 0 ]
+then
+echo "number is even"
+else
+echo "number is odd"
+fi
+
+===========================================================
+Ex. No: 2d - Shell Program to find greatest of three numbers
+Source:
+===========================================================
+echo "Enter three numbers"
+read a b c
+if [ $a -gt $b ] && [ $a -gt $c ]
+then
+echo "A is big"
+elif [ $b -gt $c ]
+then
+echo "B is big"
+else
+echo "C is big"
+fi
+
+===========================================================
+Ex. No: 2e - Shell Program to find factorial of a number
+Source:
+===========================================================
+echo "Enter the number"
+read n
+fact=1
+i=1
+while [ $i -le $n ]
+do
+fact=`expr $i \* $fact`
+i=`expr $i + 1`
+done
+echo "The factorial value of $n is $fact"
+
+===========================================================
+Ex. No: 2f - Shell Program to find Fibonacci Series
+Source:
+===========================================================
+echo " ENTER THE LIMIT FOR FIBONNACI SERIES"
+read lim
+n1=0
+n2=1
+var=0
+echo "FIBONACCI SERIES IS "
+echo "$n1"
+echo "$n2"
+while [ $var -lt `expr $lim - 2` ]
+do
+n3=`expr $n1 + $n2 `
+n1=`expr $n2 `
+n2=`expr $n3 `
+var=`expr $var + 1 `
+echo "$n2"
+done
+
+===========================================================
+Ex. No: 2g - Shell Program to perform string comparison
+Source:
+===========================================================
+echo "Enter string1"
+read str1
+echo "Enter string2"
+read str2
+if [ $str1 = $str2 ]
+then
+echo "Both strings are equal"
+else
+echo "Strings not equal"
+fi
+
+===========================================================
+Ex. No: 2h - Shell Program to perform arithmetic operations
+Source:
+===========================================================
+echo "1. Addition 2. Subtraction 3. Multiply 4. Division"
+echo "Enter your choice"
+read a
+echo "Enter the values"
+read b c
+case $a in
+1) d=`expr $b + $c`
+echo "Sum=$d"
+;;
+2) d=`expr $b - $c`
+echo "Subtraction=$d"
+;;
+3) d=`expr $b \* $c`
+echo "Multiply=$d"
+;;
+4) d=`expr $b / $c`
+echo "Division=$d"
+;;
+*) echo "No proper choice given"
+;;
+esac
+
+===========================================================
+Ex. No: 3a - Process Creation – fork() system call
+Source:
+===========================================================
+/* Process creation - fork.c */
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+
+int main()
+{
+    pid_t pid;
+    int x = 5;
+    pid = fork();
+    x++;
+    if (pid < 0)
+    {
+        printf("Process creation error");
+        exit(-1);
+    }
+    else if (pid == 0)
+    {
+        printf("Child process:");
+        printf("\n Process id is %d", getpid());
+        printf("\n Value of x is %d", x);
+        printf("\n Process id of parent is %d\n", getppid());
+    }
+    else
+    {
+        printf("\nParent process:");
+        printf("\nProcess id is %d", getpid());
+        printf("\nValue of x is %d", x);
+        printf("\nProcess id of shell is %d\n", getppid());
+    }
+    return 0;
+}
+
+===========================================================
+Ex. No: 3b - Implementation of wait() system call
+Source:
+===========================================================
+/* Wait for child termination - wait.c */
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main()
+{
+    int i, status;
+    pid_t pid;
+    pid = fork();
+    if (pid < 0)
+    {
+        printf("\nProcess creation failure\n");
+        exit(-1);
+    }
+    else if(pid > 0)
+    {
+        wait(NULL);
+        printf ("\nParent starts\nEven Nos: ");
+        for (i=2;i<=10;i+=2)
+            printf ("%3d",i);
+        printf ("\nParent ends\n");
+    }
+    else if (pid == 0)
+    {
+        printf ("Child starts\nOdd Nos: ");
+        for (i=1;i<10;i+=2)
+            printf ("%3d",i);
+        printf ("\nChild ends\n");
+    }
+    return 0;
+}
+
+===========================================================
+Ex. No: 4a - CPU Scheduling Algorithms - FCFS Scheduling
+Source:
+===========================================================
+/* FCFS Scheduling- fcfs.c */
+#include <stdio.h>
+
+struct process {
+    int pid;
+    int btime;
+    int wtime;
+    int ttime;
+} p;
+
+int main() {
+    int i,j,k,n,ttur,twat;
+    float awat,atur;
+    printf("Enter no. of process : ");
+    scanf("%d", &n);
+    for(i=0; i<n; i++) {
+        printf("Burst time for process P%d (in ms) : ",(i+1));
+        scanf("%d", &p[i].btime);
+        p[i].pid = i+1;
+    }
+    p.wtime = 0;
+    for(i=0; i<n; i++) {
+        p[i+1].wtime = p[i].wtime + p[i].btime;
+        p[i].ttime = p[i].wtime + p[i].btime;
+    }
+    ttur = twat = 0;
+    for(i=0; i<n; i++) {
+        ttur += p[i].ttime;
+        twat += p[i].wtime;
+    }
+    awat = (float)twat / n;
+    atur = (float)ttur / n;
+    
+    printf("\n FCFS Scheduling\n\n");
+    for(i=0; i<28; i++) printf("-");
+    printf("\n Process B-Time T-Time W-Time\n");
+    for(i=0; i<28; i++) printf("-");
+    for(i=0; i<n; i++) 
+        printf("\nP%d\t%4d\t%3d\t%2d",p[i].pid,p[i].btime,p[i].ttime,p[i].wtime);
+    printf("\n");
+    for(i=0; i<28; i++) printf("-");
+    printf("\n\n Average waiting time: %5.2fms", awat);
+    printf("\n Average turn around time : %5.2fms\n", atur);
+    
+    printf("\n\n GANTT Chart\n");
+    printf("-");
+    for(i=0; i<(p[n-1].ttime + 2*n); i++) printf("-");
+    printf("\n");
+    printf("|");
+    for(i=0; i<n; i++) {
+        k = p[i].btime/2;
+        for(j=0; j<k; j++) printf(" ");
+        printf("P%d",p[i].pid);
+        for(j=k+1; j<p[i].btime;j++) printf(" ");
+        printf("|");
+    }
+    printf("\n");
+    printf("-");
+    for(i=0; i<(p[n-1].ttime + 2*n); i++) printf("-");
+    printf("\n");
+    printf("0");
+    for(i=0; i<n; i++) {
+        for(j=0; j<p[i].btime; j++) printf(" ");
+        printf("%2d",p[i].ttime);
+    }
+    return 0;
+}
+
+===========================================================
+Ex. No: 4b - SJF Scheduling
+Source:
+===========================================================
+/* SJF Scheduling – sjf.c */
+#include <stdio.h>
+
+struct process {
+    int pid;
+    int btime;
+    int wtime;
+    int ttime;
+} p, temp;
+
+int main() {
+    int i,j,k,n,ttur,twat;
+    float awat,atur;
+    printf("Enter no. of process : ");
+    scanf("%d", &n);
+    for(i=0; i<n; i++) {
+        printf("Burst time for process P%d (in ms) : ",(i+1));
+        scanf("%d", &p[i].btime);
+        p[i].pid = i+1;
+    }
+    for(i=0; i<n-1; i++) {
+        for(j=i+1; j<n; j++) {
+            if((p[i].btime > p[j].btime) ||(p[i].btime == p[j].btime && p[i].pid > p[j].pid)) {
+                temp = p[i];
+                p[i] = p[j];
+                p[j] = temp;
+            }
+        }
+    }
+    p.wtime = 0;
+    for(i=0; i<n; i++) {
+        p[i+1].wtime = p[i].wtime + p[i].btime;
+        p[i].ttime = p[i].wtime + p[i].btime;
+    }
+    ttur = twat = 0;
+    for(i=0; i<n; i++) {
+        ttur += p[i].ttime;
+        twat += p[i].wtime;
+    }
+    awat = (float)twat / n;
+    atur = (float)ttur / n;
+    
+    printf("\n SJF Scheduling\n\n");
+    for(i=0; i<28; i++) printf("-");
+    printf("\n Process B-Time T-Time W-Time\n");
+    for(i=0; i<28; i++) printf("-");
+    for(i=0; i<n; i++)
+        printf("\n P%-4d\t%4d\t%3d\t%2d", p[i].pid,p[i].btime,p[i].ttime,p[i].wtime);
+    printf("\n");
+    for(i=0; i<28; i++) printf("-");
+    printf("\n\n Average waiting time: %5.2fms", awat);
+    printf("\n Average turn around time : %5.2fms\n", atur);
+    
+    printf("\n\n GANTT Chart\n");
+    printf("-");
+    for(i=0; i<(p[n-1].ttime + 2*n); i++) printf("-");
+    printf("\n|");
+    for(i=0; i<n; i++) {
+        k = p[i].btime/2;
+        for(j=0; j<k; j++) printf(" ");
+        printf("P%d",p[i].pid);
+        for(j=k+1; j<p[i].btime;j++) printf(" ");
+        printf("|");
+    }
+    printf("\n-");
+    for(i=0; i<(p[n-1].ttime + 2*n); i++) printf("-");
+    printf("\n0");
+    for(i=0; i<n; i++) {
+        for(j=0; j<p[i].btime; j++) printf(" ");
+        printf("%2d",p[i].ttime);
+    }
+    return 0;
+}
+
+===========================================================
+Ex. No: 4c - Priority Scheduling
+Source:
+===========================================================
+/* Priority Scheduling- priority.c */
+#include <stdio.h>
+
+struct process {
+    int pid;
+    int btime;
+    int pri;
+    int wtime;
+    int ttime;
+} p, temp;
+
+int main() {
+    int i,j,k,n,ttur,twat;
+    float awat,atur;
+    printf("Enter no. of process : ");
+    scanf("%d", &n);
+    for(i=0; i<n; i++) {
+        printf("Burst time for process P%d (in ms) : ", (i+1));
+        scanf("%d", &p[i].btime);
+        printf("Priority for process P%d : ", (i+1));
+        scanf("%d", &p[i].pri);
+        p[i].pid = i+1;
+    }
+    for(i=0; i<n-1; i++) {
+        for(j=i+1; j<n; j++) {
+            if((p[i].pri > p[j].pri) ||(p[i].pri == p[j].pri && p[i].pid > p[j].pid)) {
+                temp = p[i];
+                p[i] = p[j];
+                p[j] = temp;
+            }
+        }
+    }
+    p.wtime = 0;
+    for(i=0; i<n; i++) {
+        p[i+1].wtime = p[i].wtime + p[i].btime;
+        p[i].ttime = p[i].wtime + p[i].btime;
+    }
+    ttur = twat = 0;
+    for(i=0; i<n; i++) {
+        ttur += p[i].ttime;
+        twat += p[i].wtime;
+    }
+    awat = (float)twat / n;
+    atur = (float)ttur / n;
+    
+    printf("\n\t Priority Scheduling\n\n");
+    for(i=0; i<38; i++) printf("-");
+    printf("\nProcess B-Time Priority T-Time W-Time\n");
+    for(i=0; i<38; i++) printf("-");
+    for (i=0; i<n; i++)
+        printf("\nP%4d\t%4d\t%3d\t%4d\t%4d",p[i].pid,p[i].btime,p[i].pri,p[i].ttime, p[i].wtime);
+    printf("\n");
+    for(i=0; i<38; i++) printf("-");
+    printf("\n\nAverage waiting time: %5.2fms", awat);
+    printf("\nAverage turn around time : %5.2fms\n", atur);
+    
+    printf("\n\nGANTT Chart\n");
+    printf("-");
+    for(i=0; i<(p[n-1].ttime + 2*n); i++) printf("-");
+    printf("\n|");
+    for(i=0; i<n; i++) {
+        k = p[i].btime/2;
+        for(j=0; j<k; j++) printf(" ");
+        printf("P%d",p[i].pid);
+        for(j=k+1; j<p[i].btime; j++) printf(" ");
+        printf("|");
+    }
+    printf("\n-");
+    for(i=0; i<(p[n-1].ttime + 2*n); i++) printf("-");
+    printf("\n0");
+    for(i=0; i<n; i++) {
+        for(j=0; j<p[i].btime; j++) printf(" ");
+        printf("%2d",p[i].ttime);
+    }
+    return 0;
+}
+
+===========================================================
+Ex. No: 4d - Round Robin Scheduling
+Source:
+===========================================================
+/* Round robin scheduling- rr.c */
+#include <stdio.h>
+
+int main() {
+    int i,x=-1,k,m=0,n,t,s=0;
+    int a,temp,b,p,bur,bur1;
+    int wat,tur,ttur=0,twat=0,j=0;
+    float awat,atur;
+    
+    printf("Enter no. of process : ");
+    scanf("%d", &n);
+    for(i=0; i<n; i++) {
+        printf("Burst time for process P%d : ", (i+1));
+        scanf("%d", &bur[i]);
+        bur1[i] = bur[i];
+    }
+    printf("Enter the time slice (in ms) : ");
+    scanf("%d", &t);
+    for(i=0; i<n; i++) {
+        b[i] = bur[i] / t;
+        if((bur[i]%t) != 0)
+            b[i] += 1;
+        m += b[i];
+    }
+    printf("\n\t\tRound Robin Scheduling\n");
+    printf("\nGANTT Chart\n");
+    for(i=0; i<m; i++) printf(" ---------------------- ");
+    printf("\n");
+    a = 0;
+    while(j < m) {
+        if(x == n-1)
+            x = 0;
+        else
+            x++;
+        if(bur[x] >= t) {
+            bur[x] -= t;
+            a[j+1] = a[j] + t;
+            if(b[x] == 1) {
+                p[s] = x;
+                k[s] = a[j+1];
+                s++;
+            }
+            j++;
+            b[x] -= 1;
+            printf("P%d|", x+1);
+        } else if(bur[x] != 0) {
+            a[j+1] = a[j] + bur[x];
+            bur[x] = 0;
+            if(b[x] == 1) {
+                p[s] = x;
+                k[s] = a[j+1];
+                s++;
+            }
+            j++;
+            b[x] -= 1;
+            printf("P%d|",x+1);
+        }
+    }
+    printf("\n");
+    for(i=0;i<m;i++) printf(" ----------------------------- ");
+    printf("\n");
+    for(j=0; j<=m; j++) printf("%d\t", a[j]);
+    
+    for(i=0; i<n; i++) {
+        for(j=i+1; j<n; j++) {
+            if(p[i] > p[j]) {
+                temp = p[i];
+                p[i] = p[j];
+                p[j] = temp;
+                temp = k[i];
+                k[i] = k[j];
+                k[j] = temp;
+            }
+        }
+    }
+    for(i=0; i<n; i++) {
+        wat[i] = k[i] - bur1[i];
+        tur[i] = k[i];
+    }
+    for(i=0; i<n; i++) {
+        ttur += tur[i];
+        twat += wat[i];
+    }
+    
+    printf("\n\n");
+    for(i=0; i<30; i++) printf("-");
+    printf("\nProcess\tBurst\tTrnd\tWait\n");
+    for(i=0; i<30; i++) printf("-");
+    for (i=0; i<n; i++)
+        printf("\nP%-4d\t%4d\t%4d\t%4d", p[i]+1, bur1[i], tur[i],wat[i]);
+    printf("\n");
+    for(i=0; i<30; i++) printf("-");
+    awat = (float)twat / n;
+    atur = (float)ttur / n;
+    printf("\n\nAverage waiting time: %.2f ms", awat);
+    printf("\nAverage turnaround time : %.2f ms\n", atur);
+    return 0;
+}
+
+===========================================================
+Ex. No: 5a - Inter Process Communication (Fib/Prime)
+Source:
+===========================================================
+/* Fibonacci and Prime using pipe - fibprime.c */
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() {
+    pid_t pid;
+    int pfd;
+    int i,j,flg,f1,f2,f3;
+    static unsigned int ar,br;
+    
+    if(pipe(pfd) == -1) {
+        printf("Error in pipe");
+        exit(-1);
+    }
+    pid=fork();
+    if (pid == 0) {
+        printf("Child process generates Fibonacci series\n" );
+        f1 = -1;
+        f2 = 1;
+        for(i = 0;i < 25; i++) {
+            f3 = f1 + f2;
+            printf("%d\t",f3);
+            f1 = f2;
+            f2 = f3;
+            ar[i] = f3;
+        }
+        write(pfd,ar,25*sizeof(int));
+    } else if (pid > 0) {
+        wait(NULL);
+        read(pfd, br, 25*sizeof(int));
+        printf("\nParent prints Fibonacci that are Prime\n");
+        for(i = 0;i < 25; i++) {
+            flg = 0;
+            if (br[i] <= 1) flg = 1;
+            for(j=2; j<=br[i]/2; j++) {
+                if (br[i]%j == 0) {
+                    flg=1;
+                    break;
+                }
+            }
+            if (flg == 0)
+                printf("%d\t", br[i]);
+        }
+    } else {
+        printf("Process creation failed");
+        exit(-1);
+    }
+    printf("\n");
+    return 0;
+}
+
+===========================================================
+Ex. No: 5b - Implementation of commands using pipes
+Source:
+===========================================================
+/* No. of users logged - cmdpipe.c */
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main() {
+    int pfds;
+    pipe(pfds);
+    if (!fork()) {
+        close(1);
+        dup(pfds);
+        close(pfds);
+        execlp("who", "who", NULL);
+    } else {
+        close(0);
+        dup(pfds);
+        close(pfds);
+        execlp("wc", "wc", "-l", NULL);
+    }
+    return 0;
+}
+
+===========================================================
+Ex. No: 5c - Chat Messaging
+Source:
+===========================================================
+/*** SERVER CODE (srvmsg.c) ***/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+
+struct mesgq {
+    long type;
+    char text;
+} mq;
+
+int main() {
+    int msqid, len;
+    key_t key = 2013;
+    if((msqid = msgget(key, 0644|IPC_CREAT)) == -1) {
+        perror("msgget");
+        exit(1);
+    }
+    printf("Enter text, ^D to quit:\n");
+    mq.type = 1;
+    while(fgets(mq.text, sizeof(mq.text), stdin) != NULL) {
+        len = strlen(mq.text);
+        if (mq.text[len-1] == '\n')
+            mq.text[len-1] = '\0';
+        msgsnd(msqid, &mq, len+1, 0);
+        msgrcv(msqid, &mq, sizeof(mq.text), 0, 0);
+        printf("From Client: \"%s\"\n", mq.text);
+    }
+    msgctl(msqid, IPC_RMID, NULL);
+    return 0;
+}
+
+/*** CLIENT CODE (climsg.c) ***/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+
+struct mesgq {
+    long type;
+    char text;
+} mq;
+
+int main() {
+    int msqid, len;
+    key_t key = 2013;
+    if ((msqid = msgget(key, 0644)) == -1) {
+        printf("Server not active\n");
+        exit(1);
+    }
+    printf("Client ready :\n");
+    while (msgrcv(msqid, &mq, sizeof(mq.text), 0, 0) != -1) {
+        printf("From Server: \"%s\"\n", mq.text);
+        fgets(mq.text, sizeof(mq.text), stdin);
+        len = strlen(mq.text);
+        if (mq.text[len-1] == '\n')
+            mq.text[len-1] = '\0';
+        msgsnd(msqid, &mq, len+1, 0);
+    }
+    printf("Server Disconnected\n");
+    return 0;
+}
+
+===========================================================
+Ex. No: 5d - Process Communication using Shared Memory
+Source:
+===========================================================
+/*** SERVER CODE (shms.c) ***/
+/* Shared memory server - shms.c */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#define shmsize 27
+
+int main() {
+    char c;
+    int shmid;
+    key_t key =2013;
+    char *shm, *s;
+    if ((shmid = shmget(key, shmsize, IPC_CREAT|0666)) < 0) {
+        perror("shmget");
+        exit(1);
+    }
+    printf("Shared memory id : %d\n", shmid);
+    if ((shm = shmat(shmid, NULL, 0)) == (char *) -1) {
+        perror("shmat");
+        exit(1);
+    }
+    memset(shm, 0, shmsize);
+    s = shm;
+    printf("Writing (a-z) onto shared memory\n");
+    for (c = 'a'; c <= 'z'; c++)
+        *s++ = c;
+    *s = '\0';
+    while (*shm != '*');
+    printf("Client finished reading\n");
+    if(shmdt(shm) != 0)
+        fprintf(stderr, "Could not close memory segment.\n");
+    shmctl(shmid, IPC_RMID, 0);
+    return 0;
+}
+
+/*** CLIENT CODE (shmc.c) ***/
+/* Shared memory client - shmc.c */
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#define shmsize 27
+
+int main() {
+    int shmid;
+    key_t key = 2013;
+    char *shm, *s;
+    if ((shmid = shmget(key, shmsize, 0666)) < 0) {
+        printf("Server not started\n");
+        exit(1);
+    } else
+        printf("Accessing shared memory id : %d\n",shmid);
+    if ((shm = shmat(shmid, NULL, 0)) == (char *) -1) {
+        perror("shmat");
+        exit(1);
+    }
+    printf("Shared memory contents:\n");
+    for (s = shm; *s != '\0'; s++)
+        putchar(*s);
+    putchar('\n');
+    *shm = '*';
+    return 0;
+}
+
+===========================================================
+Ex. No: 5e - Implementation of Producer-Consumer Process
+Source:
+===========================================================
+/* Producer-Consumer problem using semaphore – pcsem.c */
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/sem.h>
+#include <unistd.h>
+#define N 5
+#define BUFSIZE 1
+#define PERMS 0666
+
+int *buffer;
+int nextp = 0, nextc = 0;
+int mutex, full, empty;
+
+void producer() {
+    int data;
+    if(nextp == N)
+        nextp = 0;
+    printf("Enter data for producer to produce : ");
+    scanf("%d",(buffer + nextp));
+    nextp++;
+}
+
+void consumer() {
+    int g;
+    if(nextc == N)
+        nextc = 0;
+    g = *(buffer + nextc++);
+    printf("\nConsumer consumes data %d", g);
+}
+
+void sem_op(int id, int value) {
+    struct sembuf op;
+    int v;
+    op.sem_num = 0;
+    op.sem_op = value;
+    op.sem_flg = SEM_UNDO;
+    if((v = semop(id, &op, 1)) < 0)
+        printf("\nError executing semop instruction");
+}
+
+void sem_create(int semid, int initval) {
+    int semval;
+    union semun {
+        int val;
+        struct semid_ds *buf;
+        unsigned short *array;
+    } s;
+    s.val = initval;
+    if((semval = semctl(semid, 0, SETVAL, s)) < 0)
+        printf("\nError in executing semctl");
+}
+
+void sem_wait(int id) {
+    int value = -1;
+    sem_op(id, value);
+}
+
+void sem_signal(int id) {
+    int value = 1;
+    sem_op(id, value);
+}
+
+int main() {
+    int shmid, i;
+    pid_t pid;
+    if((shmid = shmget(1000, BUFSIZE, IPC_CREAT|PERMS)) < 0) {
+        printf("\nUnable to create shared memory");
+        return 0;
+    }
+    if((buffer = (int*)shmat(shmid, (char*)0, 0)) == (int*)-1) {
+        printf("\nShared memory allocation error\n");
+        exit(1);
+    }
+    if((mutex = semget(IPC_PRIVATE, 1, PERMS|IPC_CREAT)) == -1) {
+        printf("\nCan't create mutex semaphore");
+        exit(1);
+    }
+    if((empty = semget(IPC_PRIVATE, 1, PERMS|IPC_CREAT)) == -1) {
+        printf("\nCan't create empty semaphore");
+        exit(1);
+    }
+    if((full = semget(IPC_PRIVATE, 1, PERMS|IPC_CREAT)) == -1) {
+        printf("\nCan't create full semaphore");
+        exit(1);
+    }
+    sem_create(mutex,1);
+    sem_create(empty,N);
+    sem_create(full, 0);
+    
+    if((pid = fork()) < 0) {
+        printf("\nError in process creation");
+        exit(1);
+    } else if(pid > 0) {
+        for(i=0; i<N; i++) {
+            sem_wait(empty);
+            sem_wait(mutex);
+            producer();
+            sem_signal(mutex);
+            sem_signal(full);
+        }
+    } else if(pid == 0) {
+        for(i=0; i<N; i++) {
+            sem_wait(full);
+            sem_wait(mutex);
+            consumer();
+            sem_signal(mutex);
+            sem_signal(empty);
+        }
+        printf("\n");
+    }
+    return 0;
+}
+
+===========================================================
+Ex. No: 6 - Semaphore Implementation
+Source:
+===========================================================
+/* C program to demonstrate working of Semaphores */
+#include <stdio.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <unistd.h>
+
+sem_t mutex;
+
+void* thread(void* arg) {
+    //wait
+    sem_wait(&mutex);
+    printf("\nEntered..\n");
+    //critical section
+    sleep(4);
+    //signal
+    printf("\nJust Exiting...\n");
+    sem_post(&mutex);
+    return NULL;
+}
+
+int main() {
+    sem_init(&mutex, 0, 1);
+    pthread_t t1,t2;
+    pthread_create(&t1,NULL,thread,NULL);
+    sleep(2);
+    pthread_create(&t2,NULL,thread,NULL);
+    pthread_join(t1,NULL);
+    pthread_join(t2,NULL);
+    sem_destroy(&mutex);
+    return 0;
+}
+
+===========================================================
+Ex. No: 7 - DEAD LOCK AVOIDANCE USING BANKERS ALGORITHM
+Source:
+===========================================================
+#include<stdio.h>
+/* #include<conio.h> */ /* Removed for Linux compatibility */
+
+int main() {
+    int r, av;
+    int all, max, ne, w,safe;
+    int i=0, j=0, k=0, l=0, np=0, nr=0, count=0, cnt=0;
+    /* clrscr(); */
+    printf("Enter the number of processes in a system");
+    scanf("%d", &np);
+    printf("Enter the number of resources in a system");
+    scanf("%d",&nr);
+    for(i=1; i<=nr; i++) {
+        printf("Enter no. of instances of resource R%d " ,i);
+        scanf("%d", &r[i]);
+        av[i] = r[i];
+    }
+    for(i=1; i<=np; i++)
+        for(j=1; j<=nr; j++)
+            all[i][j] = ne[i][j] = max[i][j] = w[i]=0;
+    
+    printf("Enter the allocation matrix");
+    for(i=1; i<=np; i++) {
+        for(j=1; j<=nr; j++) {
+            scanf("%d", &all[i][j]);
+            av[j] = av[j] - all[i][j];
+        }
+    }
+    
+    printf("Enter the maximum matrix");
+    for(i=1; i<=np; i++) {
+        for(j=1; j<=nr; j++) {
+            scanf("%d",&max[i][j]);
+        }
+    }
+    
+    for(i=1; i<=np; i++) {
+        for(j=1; j<=nr; j++) {
+            ne[i][j] = max[i][j] - all[i][j];
+        }
+    }
+    
+    for(i=1; i<=np; i++) {
+        printf("process P%d", i);
+        for(j=1; j<=nr; j++) {
+            printf("\n allocated %d\t",all[i][j]);
+            printf("maximum %d\t",max[i][j]);
+            printf("need %d\t",ne[i][j]);
+        }
+        printf("\n \n");
+    }
+    
+    printf("\nAvailability ");
+    for(i=1; i<=nr; i++)
+        printf("R%d %d\t", i, av[i]);
+    printf("\n ");
+    printf("\n safe sequence");
+    
+    for(count=1; count<=np; count++) {
+        for(i=1; i<=np; i++) {
+            cnt = 0;
+            for(j=1; j<=nr; j++) {
+                if(ne[i][j] <= av[j] && w[i]==0)
+                    cnt++;
+            }
+            if(cnt == nr) {
+                k++;
+                safe[k] = i;
+                for(l=1; l<=nr; l++)
+                    av[l] = av[l] + all[i][l];
+                printf("\n P%d ",safe[k]);
+                printf("\t Availability ");
+                for(l=1; l<=nr; l++)
+                    printf("R%d %d\t", l, av[l]);
+                w[i]=1;
+            }
+        }
+    }
+    /* getch(); */
+    return 0;
+}
+
+===========================================================
+Ex. No: 8 - DEAD LOCK DETECTION
+Source:
+===========================================================
+#include<stdio.h>
+/* #include<conio.h> */
+
+int max;
+int alloc;
+int need;
+int avail;
+int n, r;
+void input();
+void show();
+void cal();
+
+int main() {
+    printf("Deadlock Detection Algorithm\n");
+    input();
+    show();
+    cal();
+    /* getch(); */
+    return 0;
+}
+
+void input() {
+    int i,j;
+    printf("Enter the no of Processes\t");
+    scanf("%d",&n);
+    printf("Enter the no of resource instances\t");
+    scanf("%d", &r);
+    printf("Enter the Max Matrix\n");
+    for(i=0; i<n; i++)
+        for(j=0; j<r; j++)
+            scanf("%d", &max[i][j]);
+    
+    printf("Enter the Allocation Matrix\n");
+    for(i=0; i<n; i++)
+        for(j=0; j<r; j++)
+            scanf("%d", &alloc[i][j]);
+    
+    printf("Enter the available Resources\n");
+    for(j=0;j<r;j++)
+        scanf("%d",&avail[j]);
+}
+
+void show() {
+    int i, j;
+    printf("Process\t Allocation\t Max\t Available\t");
+    for(i=0; i<n; i++) {
+        printf("\nP%d\t", i+1);
+        for(j=0; j<r; j++) {
+            printf("%d ", alloc[i][j]);
+        }
+        printf("\t");
+        for(j=0; j<r; j++) {
+            printf("%d ", max[i][j]);
+        }
+        printf("\t");
+        if(i == 0) {
+            for(j=0; j<r; j++)
+                printf("%d ", avail[j]);
+        }
+    }
+}
+
+void cal() {
+    int finish, temp, need, flag=1, k, c1=0;
+    int dead;
+    int safe;
+    int i, j;
+    for(i=0; i<n; i++) {
+        finish[i] = 0;
+    }
+    /*find need matrix */
+    for(i=0; i<n; i++) {
+        for(j=0; j<r; j++) {
+            need[i][j]= max[i][j] - alloc[i][j];
+        }
+    }
+    while(flag) {
+        flag=0;
+        for(i=0;i<n;i++) {
+            int c=0;
+            for(j=0;j<r;j++) {
+                if((finish[i]==0) && (need[i][j] <= avail[j])) {
+                    c++;
+                    if(c == r) {
+                        for(k=0; k<r; k++) {
+                            avail[k] += alloc[i][j];
+                            finish[i]=1;
+                            flag=1;
+                        }
+                        if(finish[i] == 1) {
+                            j = 0; /* logic from source retained though j set to 0 in loop */
+                        }
+                    }
+                }
+            }
+        }
+    }
+    j=0;
+    flag=0;
+    for(i=0; i<n; i++) {
+        if(finish[i] == 0) {
+            dead[j] = i;
+            j++;
+            flag = 1;
+        }
+    }
+    if(flag == 1) {
+        printf("\n\n System is in Deadlock and the Deadlock process are\n");
+        for(i=0;i<j;i++) {
+            printf("P%d\t", dead[i]);
+        }
+    } else {
+        printf("\n No Deadlock Occurs");
+    }
+}
+
+===========================================================
+Ex. No: 9 - THREADING
+Source:
+===========================================================
+#include <stdio.h>
+#include <string.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+pthread_t tid;
+int counter;
+pthread_mutex_t lock;
+
+void* trythis(void *arg) {
+    pthread_mutex_lock(&lock);
+    unsigned long i = 0;
+    counter += 1;
+    printf("\n Job %d has started\n", counter);
+    for(i=0; i<(0xFFFFFFFF);i++);
+    printf("\n Job %d has finished\n", counter);
+    pthread_mutex_unlock(&lock);
+    return NULL;
+}
+
+int main() {
+    int i = 0;
+    int error;
+    if (pthread_mutex_init(&lock, NULL) != 0) {
+        printf("\n mutex init has failed\n");
+        return 1;
+    }
+    while(i < 2) {
+        error = pthread_create(&(tid[i]), NULL, &trythis, NULL);
+        if (error != 0)
+            printf("\nThread can't be created :[%s]", strerror(error));
+        i++;
+    }
+    pthread_join(tid, NULL);
+    pthread_join(tid, NULL);
+    pthread_mutex_destroy(&lock);
+    return 0;
+}
+
+===========================================================
+Ex. No: 10 - Paging Technique
+Source:
+===========================================================
+#include <stdio.h>
+#include <math.h>
+
+int main() {
+    int size, m, n, pgno, pagetable={5,6,7}, i, j, frameno;
+    double m1;
+    int ra=0, ofs;
+    printf("Enter process size (in KB of max 12KB):");
+    scanf("%d", &size);
+    m1 = size / 4;
+    n = ceil(m1);
+    printf("Total No. of pages: %d", n);
+    printf("\nEnter relative address (in hexa) \n");
+    scanf("%d", &ra);
+    pgno = ra / 1000;
+    ofs = ra % 1000;
+    printf("page no=%d\n", pgno);
+    printf("page table");
+    for(i=0;i<n;i++)
+        printf("\n %d [%d]", i, pagetable[i]);
+    frameno = pagetable[pgno];
+    printf("\nPhysical address: %d%d", frameno, ofs);
+    return 0;
+}
+
+===========================================================
+Ex. No: 11a - Memory Allocation using First Fit
+Source:
+===========================================================
+/* First fit allocation - ffit.c */
+#include <stdio.h>
+
+struct process {
+    int size;
+    int flag;
+    int holeid;
+} p;
+
+struct hole {
+    int size;
+    int actual;
+} h;
+
+int main() {
+    int i, np, nh, j;
+    printf("Enter the number of Holes : ");
+    scanf("%d", &nh);
+    for(i=0; i<nh; i++) {
+        printf("Enter size for hole H%d : ",i);
+        scanf("%d", &h[i].size);
+        h[i].actual =h[i].size;
+    }
+    printf("\n Enter number of process : " );
+    scanf("%d",&np);
+    for(i=0;i<np;i++) {
+        printf("Enter the size of process P%d : ",i);
+        scanf("%d", &p[i].size);
+        p[i].flag = 0;
+    }
+    for(i=0; i<np; i++) {
+        for(j=0; j<nh; j++) {
+            if(p[i].flag != 1) {
+                if(p[i].size <= h[j].size) {
+                    p[i].flag = 1;
+                    p[i].holeid = j;
+                    h[j].size -= p[i].size;
+                }
+            }
+        }
+    }
+    printf("\n\tFirst fit\n");
+    printf("\nProcess\tPSize\tHole");
+    for(i=0; i<np; i++) {
+        if(p[i].flag != 1)
+            printf("\nP%d\t%d\tNot allocated", i, p[i].size);
+        else
+            printf("\nP%d\t%d\tH%d", i, p[i].size, p[i].holeid);
+    }
+    printf("\n\nHole\tActual\tAvailable");
+    for(i=0; i<nh ;i++)
+        printf("\nH%d\t%d\t%d", i, h[i].actual, h[i].size);
+    printf("\n");
+    return 0;
+}
+
+===========================================================
+Ex. No: 11b - Memory Allocation using Best Fit
+Source:
+===========================================================
+#include <stdio.h>
+
+struct process {
+    int size;
+    int flag;
+    int holeid;
+} p;
+
+struct hole {
+    int hid;
+    int size;
+    int actual;
+} h;
+
+void bsort(struct hole bh[], int n) {
+    struct hole temp;
+    int i,j;
+    for(i=0; i<n-1; i++) {
+        for(j=i+1; j<n; j++) {
+            if(bh[i].size > bh[j].size) {
+                temp = bh[i];
+                bh[i] = bh[j];
+                bh[j] = temp;
+            }
+        }
+    }
+}
+
+int main() {
+    int i, np, nh, j;
+    printf("Enter the number of Holes : ");
+    scanf("%d", &nh);
+    for(i=0; i<nh; i++) {
+        printf("Enter size for hole H%d : ",i);
+        scanf("%d", &h[i].size);
+        h[i].actual =h[i].size;
+        h[i].hid = i;
+    }
+    printf("\nEnter number of process : " );
+    scanf("%d",&np);
+    for(i=0;i<np;i++) {
+        printf("enter the size of process P%d : ",i);
+        scanf("%d", &p[i].size);
+        p[i].flag = 0;
+    }
+    for(i=0; i<np; i++) {
+        bsort(h, nh);
+        for(j=0; j<nh; j++) {
+            if(p[i].flag != 1) {
+                if(p[i].size <= h[j].size) {
+                    p[i].flag = 1;
+                    p[i].holeid =h[j].hid;
+                    h[j].size -= p[i].size;
+                }
+            }
+        }
+    }
+    printf("\n\tBest fit\n");
+    printf("\nProcess\tPSize\tHole");
+    for(i=0; i<np; i++) {
+        if(p[i].flag != 1)
+            printf("\nP%d\t%d\tNot allocated", i, p[i].size);
+        else
+            printf("\nP%d\t%d\tH%d", i, p[i].size, p[i].holeid);
+    }
+    printf("\n\nHole\tActual\tAvailable");
+    for(i=0; i<nh ;i++)
+        printf("\nH%d\t%d\t%d", h[i].hid, h[i].actual, h[i].size);
+    printf("\n");
+    return 0;
+}
+
+===========================================================
+Ex. No: 12a - Page Replacement - FIFO
+Source:
+===========================================================
+#include <stdio.h>
+
+int main() {
+    int i, j, l, rs, frame, nf, k, avail, count=0;
+    printf("Enter length of reference string : ");
+    scanf("%d", &l);
+    printf("Enter reference string :\n");
+    for(i=1; i<=l; i++)
+        scanf("%d", &rs[i]);
+    printf("Enter number of frames : ");
+    scanf("%d", &nf);
+    for(i=0; i<nf; i++)
+        frame[i] = -1;
+    j = 0;
+    printf("\n Ref. str Page frames");
+    for(i=1; i<=l; i++) {
+        printf("\n%4d\t", rs[i]);
+        avail = 0;
+        for(k=0; k<nf; k++)
+            if(frame[k] == rs[i])
+                avail = 1;
+        if(avail == 0) {
+            frame[j] = rs[i];
+            j = (j+1) % nf;
+            count++;
+            for(k=0; k<nf; k++)
+                printf("%4d",frame[k]);
+        }
+    }
+    printf("\n\nTotal no. of page faults : %d\n",count);
+    return 0;
+}
+
+===========================================================
+Ex. No: 12b - Page Replacement - LRU
+Source:
+===========================================================
+/* LRU page replacement - lrupr.c */
+#include <stdio.h>
+
+int arrmin(int a[], int n) {
+    int i, min = a;
+    for(i=1; i<n; i++)
+        if (min > a[i])
+            min = a[i];
+    for(i=0; i<n; i++)
+        if (min == a[i])
+            return i;
+    return 0;
+}
+
+int main() {
+    int i,j,len,rs,frame,nf,k,avail,count=0;
+    int access, freq=0, dm;
+    printf("Length of Reference string : ");
+    scanf("%d", &len);
+    printf("Enter reference string :\n");
+    for(i=1; i<=len; i++)
+        scanf("%d", &rs[i]);
+    printf("Enter no. of frames : ");
+    scanf("%d", &nf);
+    for(i=0; i<nf; i++)
+        frame[i] = -1;
+    j = 0;
+    printf("\nRef. Str Page frames");
+    for(i=1; i<=len; i++) {
+        printf("\n%4d\t", rs[i]);
+        avail = 0;
+        for(k=0; k<nf; k++) {
+            if(frame[k] == rs[i]) {
+                avail = 1;
+                access[k] = ++freq;
+                break;
+            }
+        }
+        if(avail == 0) {
+            dm = 0;
+            for(k=0; k<nf; k++) {
+                if(frame[k] == -1) {
+                    dm = 1;
+                    break;
+                }
+            }
+            if(dm == 1) {
+                frame[k] = rs[i];
+                access[k] = ++freq;
+                count++;
+            } else {
+                j = arrmin(access, nf);
+                frame[j] = rs[i];
+                access[j] = ++freq;
+                count++;
+            }
+            for(k=0; k<nf; k++)
+                printf("%4d", frame[k]);
+        }
+    }
+    printf("\n\nTotal no. of page faults : %d\n", count);
+    return 0;
+}
+
+===========================================================
+Ex. No: 13a - File Organization - Single-Level Directory
+Source:
+===========================================================
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+/* #include <conio.h> */
+
+struct {
+    char dname;
+    char fname;
+    int fcnt;
+}dir;
+
+int main() {
+    int i, ch;
+    char f;
+    dir.fcnt = 0;
+    printf("\nEnter name of directory -- ");
+    scanf("%s", dir.dname);
+    while(1) {
+        printf("\n 1. Create File\t2. Delete File\t3. Search File \n4. Display Files\t5. Exit\n Enter your choice--");
+        scanf("%d",&ch);
+        switch(ch) {
+            case 1:
+                printf("\n Enter the name of the file -- ");
+                scanf("%s", dir.fname[dir.fcnt]);
+                dir.fcnt++;
+                break;
+            case 2:
+                printf("\n Enter the name of the file -- ");
+                scanf("%s", f);
+                for(i=0; i<dir.fcnt; i++) {
+                    if(strcmp(f, dir.fname[i]) == 0) {
+                        printf("File %s is deleted ",f);
+                        strcpy(dir.fname[i], dir.fname[dir.fcnt-1]);
+                        break;
+                    }
+                }
+                if(i == dir.fcnt)
+                    printf("File %s not found", f);
+                else
+                    dir.fcnt--;
+                break;
+            case 3:
+                printf("\n Enter the name of the file -- ");
+                scanf("%s", f);
+                for(i=0; i<dir.fcnt; i++) {
+                    if(strcmp(f, dir.fname[i]) == 0) {
+                        printf("File %s is found ", f);
+                        break;
+                    }
+                }
+                if(i == dir.fcnt)
+                    printf("File %s not found", f);
+                break;
+            case 4:
+                if(dir.fcnt == 0)
+                    printf("\n Directory Empty");
+                else {
+                    printf("\n The Files are -- ");
+                    for(i=0; i<dir.fcnt; i++)
+                        printf("\t%s", dir.fname[i]);
+                }
+                break;
+            default:
+                exit(0);
+        }
+    }
+    return 0;
+}
+
+===========================================================
+Ex. No: 13b - File Organization - Two-level directory
+Source:
+===========================================================
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+/* #include <conio.h> */
+
+struct {
+    char dname, fname;
+    int fcnt;
+}dir;
+
+int main() {
+    int i, ch, dcnt, k;
+    char f, d;
+    /* clrscr(); */
+    dcnt=0;
+    while(1) {
+        printf("\n\n 1. Create Directory\t 2. Create File\t 3.Delete File");
+        printf("\n 4. Search File \t \t 5. Display \t 6. Exit \n Enter your choice -- ");
+        scanf("%d", &ch);
+        switch(ch) {
+            case 1:
+                printf("\n Enter name of directory -- ");
+                scanf("%s", dir[dcnt].dname);
+                dcnt++;
+                printf("Directory created");
+                break;
+            case 2:
+                printf("\n Enter name of the directory -- ");
+                scanf("%s", d);
+                for(i=0; i<dcnt; i++)
+                    if(strcmp(d,dir[i].dname) == 0) {
+                        printf("Enter name of the file -- ");
+                        scanf("%s", dir[i].fname[dir[i].fcnt]);
+                        dir[i].fcnt++;
+                        printf("File created");
+                        break;
+                    }
+                if(i == dcnt)
+                    printf("Directory %s not found",d);
+                break;
+            case 3:
+                printf("\nEnter name of the directory -- ");
+                scanf("%s", d);
+                for(i=0; i<dcnt; i++) {
+                    if(strcmp(d,dir[i].dname) == 0) {
+                        printf("Enter name of the file -- ");
+                        scanf("%s", f);
+                        for(k=0; k<dir[i].fcnt; k++) {
+                            if(strcmp(f, dir[i].fname[k]) == 0) {
+                                printf("File %s is deleted ", f);
+                                dir[i].fcnt--;
+                                strcpy(dir[i].fname[k], dir[i].fname[dir[i].fcnt]);
+                                goto jmp;
+                            }
+                        }
+                        printf("File %s not found",f);
+                        goto jmp;
+                    }
+                }
+                printf("Directory %s not found",d);
+                jmp : break;
+            case 4:
+                printf("\nEnter name of the directory -- ");
+                scanf("%s", d);
+                for(i=0; i<dcnt; i++) {
+                    if(strcmp(d,dir[i].dname) == 0) {
+                        printf("Enter the name of the file -- ");
+                        scanf("%s", f);
+                        for(k=0; k<dir[i].fcnt; k++) {
+                            if(strcmp(f, dir[i].fname[k]) == 0) {
+                                printf("File %s is found ", f);
+                                goto jmp1;
+                            }
+                        }
+                        printf("File %s not found", f);
+                        goto jmp1;
+                    }
+                }
+                printf("Directory %s not found", d);
+                jmp1: break;
+            case 5:
+                if(dcnt == 0)
+                    printf("\nNo Directory's ");
+                else {
+                    printf("\nDirectory\tFiles");
+                    for(i=0;i<dcnt;i++) {
+                        printf("\n%s\t\t",dir[i].dname);
+                        for(k=0;k<dir[i].fcnt;k++)
+                            printf("\t%s",dir[i].fname[k]);
+                    }
+                }
+                break;
+            default:
+                exit(0);
+        }
+    }
+    return 0;
+}
+
+===========================================================
+Ex. No: 14a - Contiguous Allocation
+Source:
+===========================================================
+/* Contiguous Allocation - cntalloc.c */
+#include <stdio.h>
+#include <string.h>
+
+int num=0, length, start;
+char fid, a;
+
+void directory() {
+    int i;
+    printf("\n File Start Length\n");
+    for(i=0; i<num; i++)
+        printf("%-4s %3d %6d\n",fid[i],start[i],length[i]);
+}
+
+void display() {
+    int i;
+    for(i=0; i<20; i++)
+        printf("%4d",i);
+    printf("\n");
+    for(i=0; i<20; i++)
+        printf("%4s", a[i]);
+}
+
+int main() {
+    int i,n,k,temp,st,nb,ch,flag;
+    char id;
+    for(i=0; i<20; i++)
+        strcpy(a[i], "");
+    printf("Disk space before allocation:\n");
+    display();
+    do {
+        printf("\nEnter File name (max 3 char) : ");
+        scanf("%s", id);
+        printf("Enter start block : ");
+        scanf("%d", &st);
+        printf("Enter no. of blocks : ");
+        scanf("%d", &nb);
+        strcpy(fid[num], id);
+        length[num] = nb;
+        flag = 0;
+        if((st+nb) > 20) {
+            printf("Requirement exceeds range\n");
+            continue;
+        }
+        for(i=st; i<(st+nb); i++)
+            if(strcmp(a[i], "") != 0)
+                flag = 1;
+        if(flag == 1) {
+            printf("Contiguous allocation not possible.\n");
+            continue;
+        }
+        start[num] = st;
+        for(i=st; i<(st+nb);i++)
+            strcpy(a[i], id);
+        printf("Allocation done\n");
+        num++;
+        printf("\n Any more allocation (1. yes / 2. no)? : ");
+        scanf("%d", &ch);
+    } while (ch == 1);
+    
+    printf("\n\t\t\t Contiguous Allocation\n");
+    printf("Directory:");
+    directory();
+    printf("\nDisk space after allocation:\n");
+    display();
+    return 0;
+}
+
+===========================================================
+Ex. No: 14b - Linked File Allocation
+Source:
+===========================================================
+#include <stdio.h>
+#include <string.h>
+/* #include <conio.h> */
+
+int main() {
+    static int b, i, j, blocks;
+    char F, S, ch;
+    int sb, eb, x, n;
+    printf("\n Enter no. of Files :");
+    scanf("%d",&n);
+    for(i=0;i<n;i++) {
+        printf("\n Enter file %d name ::", i+1);
+        scanf("%s", F[i]); /* Removed & */
+        printf("\n Enter No. of blocks:", i+1);
+        scanf("%d",&b[i]);
+    }
+    for(i=0;i<n;i++) {
+        printf("\n Enter Starting block of file%d::",i+1);
+        scanf("%d", &sb[i]);
+        printf("\n Enter blocks for file%d::\n", i+1);
+        for(j=0; j<b[i]-1;) {
+            printf("\n Enter the %dblock ::", j+2);
+            scanf("%d", &x);
+            if(b[i] != 0) {
+                blocks[i][j] = x;
+                j++;
+            } else
+                printf("\n Invalid block::");
+        }
+    }
+    printf("\nEnter the Filename :");
+    scanf("%s", S); /* Removed & */
+    for(i=0; i<n; i++) {
+        if(strcmp(F[i],S) == 0) {
+            printf("\nFname\tBsize\tStart\tBlocks\n");
+            printf("\n\n");
+            printf("\n%s\t%d\t%d\t", F[i], b[i], sb[i]);
+            printf("%d->",sb[i]);
+            for(j=0; j<b[i]; j++) {
+                if(b[i] != 0)
+                    printf("%d->", blocks[i][j]);
+            }
+        }
+    }
+    printf("\n\n");
+    return 0;
+}
+
+===========================================================
+Ex. No: 15a - FCFS Disk Scheduling
+Source:
+===========================================================
+#include<stdio.h>
+int main() {
+    int t, n, i, j, tohm, tot=0;
+    float avhm;
+    /* clrscr(); */
+    printf("enter the no.of tracks");
+    scanf("%d",&n);
+    printf("enter the tracks to be traversed");
+    for(i=2;i<n+2;i++)
+        scanf("%d",&t[i]);
+    for(i=1;i<n+1;i++) {
+        tohm[i]=t[i+1]-t[i];
+        if(tohm[i]<0)
+            tohm[i]=tohm[i]*(-1);
+    }
+    for(i=1;i<n+1;i++)
+        tot+=tohm[i];
+    avhm=(float)tot/n;
+    printf("Tracks traversed\tDifference between tracks\n");
+    for(i=1;i<n+1;i++)
+        printf("%d\t\t\t%d\n",t[i],tohm[i]);
+    printf("\nAverage header movements:%f",avhm);
+    return 0;
+}
+
+===========================================================
+Ex. No: 15b - SCAN Disk Scheduling
+Source:
+===========================================================
+#include<stdio.h>
+int main () {
+    int t, d, h, i, j, n, temp, k, atr, tot, p, sum=0;
+    /* clrscr(); */
+    printf("enter the no of tracks to be traveresed");
+    scanf("%d",&n);
+    printf("enter the position of head");
+    scanf("%d",&h);
+    t=0;t=h;
+    printf("enter the tracks");
+    for(i=2;i<n+2;i++)
+        scanf("%d",&t[i]);
+    for(i=0;i<n+2;i++) {
+        for(j=0;j<(n+2)-i-1;j++) {
+            if(t[j]>t[j+1]) {
+                temp=t[j];
+                t[j]=t[j+1];
+                t[j+1]=temp;
+            }
+        }
+    }
+    for(i=0;i<n+2;i++)
+        if(t[i]==h)
+            j=i;k=i;
+    p=0;
+    while(t[j]!=0) {
+        atr[p]=t[j];
+        j--;
+        p++;
+    }
+    atr[p]=t[j];
+    for(p=k+1;p<n+2;p++,k++)
+        atr[p]=t[k+1];
+    for(j=0;j<n+1;j++) {
+        if(atr[j]>atr[j+1])
+            d[j]=atr[j]-atr[j+1];
+        else
+            d[j]=atr[j+1]-atr[j];
+        sum+=d[j];
+    }
+    printf("\nAverage header movements:%f",(float)sum/n);
+    return 0;
+}
+
+===========================================================
+Ex. No: 15c - C-SCAN Disk Scheduling
+Source:
+===========================================================
+#include<stdio.h>
+int main() {
+    int t, d, h, i, j, n, temp, k, atr, tot, p, sum=0;
+    /* clrscr(); */
+    printf("enter the no of tracks to be traveresed");
+    scanf("%d",&n);
+    printf("enter the position of head");
+    scanf("%d",&h);
+    t=0;t=h;
+    printf("enter total tracks");
+    scanf("%d",&tot);
+    t=tot-1;
+    printf("enter the tracks");
+    for(i=3;i<=n+2;i++)
+        scanf("%d",&t[i]);
+    for(i=0;i<=n+2;i++)
+        for(j=0;j<=(n+2)-i-1;j++)
+            if(t[j]>t[j+1]) {
+                temp=t[j];
+                t[j]=t[j+1];
+                t[j+1]=temp;
+            }
+    for(i=0;i<=n+2;i++)
+        if(t[i]==h)
+            j=i;
+    p=0;
+    while(t[j]!=tot-1) {
+        atr[p]=t[j];
+        j++;
+        p++;
+    }
+    atr[p]=t[j];
+    p++;
+    i=0;
+    while(p!=(n+3) && t[i]!=t[h]) {
+        atr[p]=t[i];
+        i++;
+        p++;
+    }
+    for(j=0;j<n+2;j++) {
+        if(atr[j]>atr[j+1])
+            d[j]=atr[j]-atr[j+1];
+        else
+            d[j]=atr[j+1]-atr[j];
+        sum+=d[j];
+    }
+    printf("total header movements%d",sum);
+    printf("avg is %f",(float)sum/n);
+    return 0;
+}
+```
