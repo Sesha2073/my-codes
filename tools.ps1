@@ -33,4 +33,4 @@ function get-code {
     }
 }
 
-Write-Host "✅ Universal Loader Active! Type 'get-code <filename>' to fetch." -ForegroundColor Green
+Write-Host "which lab?" -ForegroundColor Green
