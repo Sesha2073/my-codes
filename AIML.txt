@@ -1,231 +1,569 @@
-# =========================
-# Program 1(a): Breadth First Search (BFS)
-# =========================
+#-------1a
 from collections import deque
+class Graph:
+def __init__(self, directed=True):
+self.edges = {}
+self.directed = directed
+def add_edge(self, node1, node2, _reversed=False):
+try:
+neighbors = self.edges[node1]
+except KeyError:
+neighbors = set()
+neighbors.add(node2)
+self.edges[node1] = neighbors
+if not self.directed and not _reversed:
+self.add_edge(node2, node1, True)
+def neighbors(self, node):
+try:
+return self.edges[node]
+except KeyError:
+return []
+def breadth_first_search(self, start, goal):
+found, fringe, visited, came_from = False, deque([start]), set([start]), {start: None}
+print('{:11s} | {}'.format('Expand Node', 'Fringe'))
+print('-'*20)
+print('{:11s} | {}'.format('-', start))
+while not found and len(fringe):
+current = fringe.pop()
+print('{:11s}'.format(current), end=' | ')
+if current == goal:
+found = True
+break
+for node in self.neighbors(current):
+if node not in visited:
+visited.add(node)
+fringe.appendleft(node)
+came_from[node] = current
+print(', '.join(fringe))
 
-class GraphBFS:
-    def __init__(self, directed=True):
-        self.edges = {}
-        self.directed = directed
-
-    def add_edge(self, node1, node2, reversed=False):
-        if node1 not in self.edges:
-            self.edges[node1] = set()
-        self.edges[node1].add(node2)
-        if not self.directed and not reversed:
-            self.add_edge(node2, node1, True)
-
-    def neighbors(self, node):
-        return self.edges.get(node, [])
-
-    def breadth_first_search(self, start, goal):
-        found = False
-        fringe = deque([start])
-        visited = set([start])
-        came_from = {start: None}
-
-        print('{:11s} | {}'.format('Expand Node', 'Fringe'))
-        print('{:11s} | {}'.format('-', start))
-
-        while not found and fringe:
-            current = fringe.pop()
-            print('{:11s}'.format(current), end=' | ')
-            if current == goal:
-                found = True
-                break
-            for node in self.neighbors(current):
-                if node not in visited:
-                    visited.add(node)
-                    fringe.appendleft(node)
-                    came_from[node] = current
-            print(', '.join(fringe))
-
-        if found:
-            print()
-            return came_from
-        else:
-            print(f'No path from {start} to {goal}')
-            return None
-
-    @staticmethod
-    def print_path(came_from, goal):
-        parent = came_from[goal]
-        if parent:
-            GraphBFS.print_path(came_from, parent)
-        else:
-            print(goal, end='')
-            return
-        print(' =>', goal, end='')
-
-
-graph_bfs = GraphBFS(directed=False)
-graph_bfs.add_edge('A', 'B')
-graph_bfs.add_edge('A', 'S')
-graph_bfs.add_edge('S', 'G')
-graph_bfs.add_edge('S', 'C')
-graph_bfs.add_edge('C', 'F')
-graph_bfs.add_edge('G', 'F')
-graph_bfs.add_edge('C', 'D')
-graph_bfs.add_edge('C', 'E')
-graph_bfs.add_edge('E', 'H')
-graph_bfs.add_edge('G', 'H')
-
+if found:
+print(); return came_from
+else:
+print('No path from {} to {}'.format(start, goal))
+@staticmethod
+def print_path(came_from, goal):
+parent = came_from[goal]
+if parent:
+Graph.print_path(came_from, parent)
+else:
+print(goal, end='')
+return
+print('=>', goal, end='')
+graph = Graph(directed=False)
+graph.add_edge('A', 'B')
+graph.add_edge('A', 'S')
+graph.add_edge('S', 'G')
+graph.add_edge('S', 'C')
+graph.add_edge('C', 'F')
+graph.add_edge('G', 'F')
+graph.add_edge('C', 'D')
+graph.add_edge('C', 'E')
+graph.add_edge('E', 'H')
+graph.add_edge('G', 'H')
 start, goal = 'A', 'H'
-path_bfs = graph_bfs.breadth_first_search(start, goal)
-if path_bfs:
-    print('Path:', end=' ')
-    GraphBFS.print_path(path_bfs, goal)
-    print()
+traced_path = graph.breadth_first_search(start, goal)
+if (traced_path):
+print('Path:', end=' ')
+Graph.print_path(traced_path, goal)
+print()
 
-
-# =========================
-# Program 1(b): Depth First Search (DFS)
-# =========================
-from collections import deque
-
-class GraphDFS:
-    def __init__(self, directed=True):
-        self.edges = {}
-        self.directed = directed
-
-    def add_edge(self, node1, node2, reversed=False):
-        if node1 not in self.edges:
-            self.edges[node1] = set()
-        self.edges[node1].add(node2)
-        if not self.directed and not reversed:
-            self.add_edge(node2, node1, True)
-
-    def neighbors(self, node):
-        return self.edges.get(node, [])
-
-    def depth_first_search(self, start, goal):
-        found = False
-        fringe = deque([start])
-        visited = set([start])
-        came_from = {start: None}
-
-        print('{:11s} | {}'.format('Expand Node', 'Fringe'))
-        print('{:11s} | {}'.format('-', start))
-
-        while not found and fringe:
-            current = fringe.pop()
-            print('{:11s}'.format(current), end=' | ')
-            if current == goal:
-                found = True
-                break
-            for node in self.neighbors(current):
-                if node not in visited:
-                    visited.add(node)
-                    fringe.append(node)
-                    came_from[node] = current
-            print(', '.join(fringe))
-
-        if found:
-            print()
-            return came_from
-        else:
-            print(f'No path from {start} to {goal}')
-            return None
-
-    @staticmethod
-    def print_path(came_from, goal):
-        parent = came_from[goal]
-        if parent:
-            GraphDFS.print_path(came_from, parent)
-        else:
-            print(goal, end='')
-            return
-        print(' =>', goal, end='')
-
-
-graph_dfs = GraphDFS(directed=False)
-graph_dfs.add_edge('A', 'B')
-graph_dfs.add_edge('A', 'S')
-graph_dfs.add_edge('S', 'G')
-graph_dfs.add_edge('S', 'C')
-graph_dfs.add_edge('C', 'F')
-graph_dfs.add_edge('G', 'F')
-graph_dfs.add_edge('C', 'D')
-graph_dfs.add_edge('C', 'E')
-graph_dfs.add_edge('E', 'H')
-graph_dfs.add_edge('G', 'H')
-
+# 1b
+def depth_first_search(self, start, goal):
+found, fringe, visited, came_from = False, deque([start]), set([start]), {start: None}
+print('{:11s} | {}'.format('Expand Node', 'Fringe'))
+print('-'*20)
+print('{:11s} | {}'.format('-', start))
+while not found and len(fringe):
+current = fringe.pop()
+print('{:11s}'.format(current), end=' | ')
+if current == goal:
+found = True
+break
+for node in self.neighbors(current):
+if node not in visited:
+visited.add(node)
+fringe.append(node)
+came_from[node] = current
+print(', '.join(fringe))
+if found:
+print(); return came_from
+else:
+print('No path from {} to {}'.format(start, goal))
+graph = Graph(directed=False)
+graph.add_edge('A', 'B')
+graph.add_edge('A', 'S')
 start, goal = 'A', 'H'
-path_dfs = graph_dfs.depth_first_search(start, goal)
-if path_dfs:
-    print('Path:', end=' ')
-    GraphDFS.print_path(path_dfs, goal)
-    print()
+traced_path = graph.depth_first_search(start, goal)
+if (traced_path):
+print('Path:', end=' ')
+Graph.print_path(traced_path, goal)
+print()
 
-
-# =========================
-# Program 2(a): A* Search Algorithm
-# =========================
-
-def aStarAlgo(start_node, stop_node):
-    open_set = {start_node}
-    closed_set = set()
-    g = {start_node: 0}
-    parents = {start_node: start_node}
-
-    while open_set:
-        n = None
-        for v in open_set:
-            if n is None or g[v] + heuristic(v) < g[n] + heuristic(n):
-                n = v
-
-        if n == stop_node:
-            path = []
-            while parents[n] != n:
-                path.append(n)
-                n = parents[n]
-            path.append(start_node)
-            path.reverse()
-            print('Path found:', path)
-            return path
-
-        for (m, weight) in get_neighbors(n):
-            if m not in open_set and m not in closed_set:
-                open_set.add(m)
-                parents[m] = n
-                g[m] = g[n] + weight
-            else:
-                if g[m] > g[n] + weight:
-                    g[m] = g[n] + weight
-                    parents[m] = n
-                    if m in closed_set:
-                        closed_set.remove(m)
-                        open_set.add(m)
-
-        open_set.remove(n)
-        closed_set.add(n)
-
-    print('Path does not exist!')
-    return None
-
-
+#2a
 def get_neighbors(v):
-    return Graph_nodes.get(v, [])
-
-
+if v in Graph_nodes:
+return Graph_nodes[v]
+else:
+return None
 def heuristic(n):
-    H_dist = {
-        'A': 10, 'B': 8, 'C': 5, 'D': 7, 'E': 3,
-        'F': 6, 'G': 5, 'H': 3, 'I': 1, 'J': 0
-    }
-    return H_dist[n]
-
-
-Graph_nodes = {
-    'A': [('B', 6), ('F', 3)],
-    'B': [('C', 3), ('D', 2)],
-    'C': [('D', 1), ('E', 5)],
-    'D': [('C', 1), ('E', 8)],
-    'E': [('I', 5), ('J', 5)],
-    'F': [('G', 1), ('H', 7)],
-    'G': [('I', 3)],
-    'H': [('I', 2)],
-    'I': [('E', 5), ('J', 3)]
+H_dist = {
+'A': 10, 'B': 8, 'C': 5, 'D': 7, 'E': 3,
+'F': 6, 'G': 5, 'H': 3, 'I': 1, 'J': 0
 }
+return H_dist[n]
+def aStarAlgo(start_node, stop_node):
+open_set = set([start_node])
+closed_set = set()
+g = {}
+parents = {}
+g[start_node] = 0
+parents[start_node] = start_node
+while len(open_set) > 0:
+n = None
+for v in open_set:
+if n == None or g[v] + heuristic(v) < g[n] + heuristic(n):
+n=v
+if n == stop_node or Graph_nodes[n] == None:
+pass
+else:
+for (m, weight) in get_neighbors(n):
+if m not in open_set and m not in closed_set:
+open_set.add(m)
+parents[m] = n
+g[m] = g[n] + weight
+else:
+if g[m] > g[n] + weight:
+g[m] = g[n] + weight
 
+parents[m] = n
+if m in closed_set:
+closed_set.remove(m)
+open_set.add(m)
+if n == None:
+print('Path does not exist!')
+return None
+if n == stop_node:
+path = []
+while parents[n] != n:
+path.append(n)
+n = parents[n]
+path.append(start_node)
+path.reverse()
+print('Path found: {}'.format(path))
+return path
+open_set.remove(n)
+closed_set.add(n)
+print('Path does not exist!')
+return None
+Graph_nodes = {
+'A': [('B', 6), ('F', 3)],
+'B': [('C', 3), ('D', 2)],
+'C': [('D', 1), ('E', 5)],
+'D': [('C', 1), ('E', 8)],
+'E': [('I', 5), ('J', 5)],
+'F': [('G', 1), ('H', 7)],
+'G': [('I', 3)],
+'H': [('I', 2)],
+'I': [('E', 5), ('J', 3)],
+}
 aStarAlgo('A', 'J')
+
+#2b
+class Graph:
+def __init__(self, graph, heuristicNodeList, startNode):
+self.graph = graph
+self.H = heuristicNodeList
+self.start = startNode
+self.parent = {}
+self.status = {}
+self.solutionGraph = {}
+def applyAOStar(self):
+self.aoStar(self.start, False)
+def getNeighbors(self, v):
+return self.graph.get(v, '')
+def getStatus(self, v):
+return self.status.get(v, 0)
+def setStatus(self, v, val):
+self.status[v] = val
+def getHeuristicNodeValue(self, n):
+return self.H.get(n, 0)
+def setHeuristicNodeValue(self, n, value):
+self.H[n] = value
+def printSolution(self):
+print("FOR GRAPH SOLUTION, TRAVERSE THE GRAPH FROM THE START NODE:",
+self.start)
+print(self.solutionGraph)
+def computeMinimumCostChildNodes(self, v):
+minimumCost = 0
+costToChildNodeListDict = {}
+costToChildNodeListDict[minimumCost] = []
+flag = True
+
+for nodeInfoTupleList in self.getNeighbors(v):
+cost = 0
+nodeList = []
+for c, weight in nodeInfoTupleList:
+cost = cost + self.getHeuristicNodeValue(c) + weight
+nodeList.append(c)
+if flag == True:
+minimumCost = cost
+costToChildNodeListDict[minimumCost] = nodeList
+flag = False
+else:
+if minimumCost > cost:
+minimumCost = cost
+costToChildNodeListDict[minimumCost] = nodeList
+return minimumCost, costToChildNodeListDict[minimumCost]
+def aoStar(self, v, backTracking):
+print("HEURISTIC VALUES :", self.H)
+print("SOLUTION GRAPH:", self.solutionGraph)
+print("PROCESSING NODE:", v)
+if self.getStatus(v) >= 0:
+minimumCost, childNodeList = self.computeMinimumCostChildNodes(v)
+self.setHeuristicNodeValue(v, minimumCost)
+self.setStatus(v, len(childNodeList))
+solved = True
+for childNode in childNodeList:
+self.parent[childNode] = v
+if self.getStatus(childNode) != -1:
+solved = solved & False
+if solved == True:
+self.setStatus(v, -1)
+self.solutionGraph[v] = childNodeList
+if v != self.start:
+
+self.aoStar(self.parent[v], True)
+if backTracking == False:
+for childNode in childNodeList:
+self.setStatus(childNode, 0)
+self.aoStar(childNode, False)
+h1 = {'A': 1, 'B': 6, 'C': 2, 'D': 12, 'E': 2, 'F': 1, 'G': 5, 'H': 7, 'I': 7, 'J': 1}
+graph1 = {
+'A': [[('B', 1), ('C', 1)], [('D', 1)]],
+'B': [[('G', 1)], [('H', 1)]],
+'C': [[('J', 1)]],
+'D': [[('E', 1), ('F', 1)]],
+'G': [[('I', 1)]]
+}
+G1 = Graph(graph1, h1, 'A')
+G1.applyAOStar()
+G1.printSolution()
+
+#3
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.naive_bayes import GaussianNB
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+# Load Data
+data = pd.read_csv('tennisdata.csv') # Ensure this file exists
+print("First 5 Values:", data.head())
+# Split features and target
+X = data.iloc[:, :-1]
+y = data.iloc[:, -1]
+# Encode Categorical Data
+le = LabelEncoder()
+X.Outlook = le.fit_transform(X.Outlook)
+X.Temperature = le.fit_transform(X.Temperature)
+X.Humidity = le.fit_transform(X.Humidity)
+X.Windy = le.fit_transform(X.Windy)
+y = le.fit_transform(y) # Encodes Yes/No
+# Split Train/Test
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
+# Train Model
+classifier = GaussianNB()
+classifier.fit(X_train, y_train)
+# Evaluate
+y_pred = classifier.predict(X_test)
+print("Accuracy is:", accuracy_score(y_pred, y_test))
+
+#4
+import pandas as pd
+from pgmpy.models import BayesianModel
+from pgmpy.estimators import MaximumLikelihoodEstimator
+from pgmpy.inference import VariableElimination
+data = pd.read_csv("heartdisease.csv")
+heart_disease = pd.DataFrame(data)
+model = BayesianModel([
+('age', 'Lifestyle'),
+('Gender', 'Lifestyle'),
+('Family', 'heartdisease'),
+('diet', 'cholestrol'),
+('Lifestyle', 'diet'),
+('cholestrol', 'heartdisease'),
+('diet', 'cholestrol')
+])
+# Train Model
+model.fit(heart_disease, estimator=MaximumLikelihoodEstimator)
+# Inference
+HeartDisease_infer = VariableElimination(model)
+# Query
+print('Enter details for prediction...')
+q = HeartDisease_infer.query(
+variables=['heartdisease'],
+evidence={
+'age': int(input('Enter age: ')),
+'Gender': int(input('Enter Gender: ')),
+'Family': int(input('Enter Family history: ')),
+'diet': int(input('Enter diet: ')),
+'Lifestyle': int(input('Enter Lifestyle: ')),
+'cholestrol': int(input('Enter cholestrol: '))
+}
+)
+print(q)
+
+#5a
+import pandas as pd
+import numpy as np
+from sklearn import linear_model
+df = pd.read_csv('homeprices.csv')
+# Preprocessing: Fill missing bedrooms with median
+median_bedrooms = df.bedrooms.median()
+df.bedrooms = df.bedrooms.fillna(median_bedrooms)
+# Train Model
+reg = linear_model.LinearRegression()
+reg.fit(df.drop('price', axis='columns'), df.price)
+print("Coefficients:", reg.coef_)
+print("Intercept:", reg.intercept_)
+# Predict
+price_pred = reg.predict([[3000, 3, 40]])
+print("Predicted Price for (3000 sqft, 3 bed, 40 yrs):", price_pred)
+
+#5b
+import pandas as pd
+from matplotlib import pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+df = pd.read_csv("insurance_data.csv")
+# Visualization (Optional)
+plt.scatter(df.age, df.bought_insurance, marker='+', color='red')
+# Split Data
+X_train, X_test, y_train, y_test = train_test_split(df[['age']], df.bought_insurance,
+train_size=0.8)
+# Train Model
+model = LogisticRegression()
+model.fit(X_train, y_train)
+# Predict
+y_predicted = model.predict(X_test)
+print("Predicted:", y_predicted)
+print("Probabilities:", model.predict_proba(X_test))
+print("Score:", model.score(X_test, y_test))
+# Manual verification logic
+#z=m*x+b
+# y = sigmoid(z)
+
+#6a
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn import metrics
+from sklearn.metrics import classification_report, confusion_matrix
+data = pd.read_csv('covid19.csv')
+# Encode all categorical columns
+le = LabelEncoder()
+for col in data.columns:
+data[col] = le.fit_transform(data[col].astype(str))
+# Features and Target
+X = data[data.columns[:-1]]
+y = data['Label']
+# Split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
+# Train
+model = DecisionTreeClassifier()
+model.fit(X_train, y_train)
+# Predict & Evaluate
+y_pred = model.predict(X_test)
+print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+
+#6b
+from sklearn.ensemble import RandomForestClassifier
+clf = RandomForestClassifier(n_estimators=100)
+clf.fit(X_train, y_train)
+y_pred = clf.predict(X_test)
+print("Accuracy for Random Forest:", metrics.accuracy_score(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+
+#7
+# (Imports and Preprocessing same as 6A)
+from sklearn import svm
+from sklearn.metrics import roc_curve, roc_auc_score
+import matplotlib.pyplot as plt
+clf = svm.SVC(kernel='linear')
+clf.fit(X_train, y_train)
+# Predict
+y_pred = clf.predict(X_test)
+print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+# ROC Calculation (if binary classification)
+# ns_probs = [0 for _ in range(len(y_test))]
+# ns_auc = roc_auc_score(y_test, ns_probs)
+# lr_auc = roc_auc_score(y_test, y_pred)
+# print('SVM: ROC AUC=%.3f' % (lr_auc))
+# (Plotting code omitted for brevity, refer manual for plots)
+
+#8
+from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
+from sklearn.datasets import load_iris
+import sklearn.metrics as sm
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn import preprocessing
+dataset = load_iris()
+X = pd.DataFrame(dataset.data,
+columns=['Sepal_Length','Sepal_Width','Petal_Length','Petal_Width'])
+y = pd.DataFrame(dataset.target, columns=['Targets'])
+plt.figure(figsize=(14,7))
+colormap = np.array(['red', 'lime', 'black'])
+plt.subplot(1,3,1)
+plt.scatter(X.Petal_Length, X.Petal_Width, c=colormap[y.Targets], s=40)
+plt.title('Real')
+model = KMeans(n_clusters=3)
+model.fit(X)
+predY = np.choose(model.labels_, [0,1,2]).astype(np.int64)
+plt.subplot(1,3,2)
+plt.scatter(X.Petal_Length, X.Petal_Width, c=colormap[predY], s=40)
+plt.title('KMeans')
+scaler = preprocessing.StandardScaler()
+scaler.fit(X)
+xsa = scaler.transform(X)
+xs = pd.DataFrame(xsa, columns=X.columns)
+gmm = GaussianMixture(n_components=3)
+gmm.fit(xs)
+y_cluster_gmm = gmm.predict(xs)
+plt.subplot(1,3,3)
+plt.scatter(X.Petal_Length, X.Petal_Width, c=colormap[y_cluster_gmm], s=40)
+plt.title('GMM Classification')
+plt.show()
+
+#9
+from sklearn.cluster import KMeans
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
+from matplotlib import pyplot as plt
+df = pd.read_csv("income.csv")
+# Plot initial
+plt.scatter(df.Age, df['Income($)'])
+plt.xlabel('Age')
+plt.ylabel('Income($)')
+# KMeans
+km = KMeans(n_clusters=3)
+y_predicted = km.fit_predict(df[['Age', 'Income($)']])
+df['cluster'] = y_predicted
+# Centroids
+print(km.cluster_centers_)
+# Elbow Plot Logic
+sse = []
+k_rng = range(1, 10)
+for k in k_rng:
+km = KMeans(n_clusters=k)
+km.fit(df[['Age', 'Income($)']])
+sse.append(km.inertia_)
+plt.figure()
+plt.plot(k_rng, sse)
+plt.xlabel('K')
+plt.ylabel('Sum of squared error')
+plt.show()
+
+#10
+import numpy as np
+import math
+def nCr(n,r):
+f = math.factorial
+return f(n) / f(r) / f(n-r)
+def binomial(x, n, p):
+return nCr(n,x) * (p**x) * ((1-p)**(n-x))
+X = np.array([5, 9, 8, 4, 7]) # Example data from typical EM problem
+n = 10
+p1 = 0.6 # Initial pA
+p2 = 0.5 # Initial pB
+n_trials = len(X)
+n_iters = 10
+print('Init: p1={}, p2={}'.format(p1, p2))
+for i in range(n_iters):
+print(f'EM Iter: {i+1}')
+# E-step
+q = np.zeros([n_trials, 2])
+for trial in range(n_trials):
+x = X[trial]
+lam = 0.5 # Prior
+# Probability coming from Coin A vs Coin B
+q[trial, 0] = lam * binomial(x, n, p1)
+q[trial, 1] = (1-lam) * binomial(x, n, p2)
+q[trial, :] /= np.sum(q[trial, :]) # Normalize
+print('E-step: q(z)=\n', q)
+# M-step
+# Update p1 and p2 based on weighted counts
+p1 = sum((X/n) * q[:, 0]) / sum(q[:, 0])
+p2 = sum((X/n) * q[:, 1]) / sum(q[:, 1])
+print('M-step: p1={}, p2={}'.format(p1, p2))
+
+#11
+import numpy as np
+import keras
+from keras.datasets import mnist
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.optimizers import RMSprop
+batch_size = 128
+num_classes = 10
+epochs = 2
+# Load Data
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+x_train = x_train.reshape(60000, 784).astype('float32') / 255
+x_test = x_test.reshape(10000, 784).astype('float32') / 255
+y_train = keras.utils.to_categorical(y_train, num_classes)
+y_test = keras.utils.to_categorical(y_test, num_classes)
+model = Sequential()
+model.add(Dense(32, activation='sigmoid', input_shape=(784,)))
+model.add(Dense(32, activation='sigmoid'))
+model.add(Dense(num_classes, activation='softmax'))
+model.summary()
+model.compile(loss='categorical_crossentropy', optimizer=RMSprop(),
+metrics=['accuracy'])
+# Train
+history = model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, verbose=1,
+validation_data=(x_test, y_test))
+# Evaluate
+score = model.evaluate(x_test, y_test, verbose=0)
+print('Test loss:', score[0])
+print('Test accuracy:', score[1])
+
+#12
+from keras import models, layers
+from keras.layers import Dense, Flatten, Conv2D, MaxPooling2D
+from keras.preprocessing.image import ImageDataGenerator
+from keras.optimizers import SGD
+# Data Generators
+train_datagen = ImageDataGenerator(rescale=1./255)
+test_datagen = ImageDataGenerator(rescale=1./255)
+# Assuming folders 'cellimage/train' and 'cellimage/test' exist
+train_generator = train_datagen.flow_from_directory(
+'cellimage/train/', target_size=(64, 64), batch_size=16, class_mode='categorical')
+validation_generator = test_datagen.flow_from_directory(
+'cellimage/test/', target_size=(64, 64), batch_size=1, class_mode='categorical')
+# Build CNN Model
+model = models.Sequential()
+model.add(Conv2D(128, kernel_size=(3,3), activation='relu', input_shape=(64,64,3)))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Flatten())
+model.add(Dense(32, activation='relu'))
+model.add(Dense(4, activation='softmax')) # Assuming 4 classes
+sgd = SGD(lr=0.01, momentum=0.9, nesterov=True)
+model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
+history = model.fit_generator(
+train_generator,
+steps_per_epoch=train_generator.samples // 16,
+epochs=10,
+validation_data=validation_generator,
+validation_steps=validation_generator.samples // 1
+)
+model.save('cnn_classification.h5')
+
+
