@@ -383,3 +383,164 @@ return 0;
 ?>
 </body>
 </html>
+
+
+4th program 
+
+<?php
+// Database configuration
+$servername = "localhost:4306";
+$username   = "root";
+$password   = "";
+$dbname     = "personal_info";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Add user data
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $first_name = $conn->real_escape_string($_POST["first_name"]);
+    $last_name  = $conn->real_escape_string($_POST["last_name"]);
+    $email      = $conn->real_escape_string($_POST["email"]);
+    $phone      = $conn->real_escape_string($_POST["phone"]);
+    $address    = $conn->real_escape_string($_POST["address"]);
+
+    $sql = "INSERT INTO users (first_name, last_name, email, phone, address)
+            VALUES ('$first_name', '$last_name', '$email', '$phone', '$address')";
+
+    if ($conn->query($sql) === TRUE) {
+        $message = "User added successfully!";
+    } else {
+        $message = "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
+
+// Retrieve user data
+$sql    = "SELECT * FROM users";
+$result = $conn->query($sql);
+
+$conn->close();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Information System</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        form div {
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Personal Information System</h1>
+
+    <?php if (!empty($message)): ?>
+        <p class="message"><?php echo $message; ?></p>
+    <?php endif; ?>
+
+    <form method="POST" action="">
+        <h2>Add User Information</h2>
+
+        <div>
+            <label for="first_name">First Name:</label>
+            <input type="text" id="first_name" name="first_name" required>
+        </div>
+
+        <div>
+            <label for="last_name">Last Name:</label>
+            <input type="text" id="last_name" name="last_name" required>
+        </div>
+
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+
+        <div>
+            <label for="phone">Phone:</label>
+            <input type="text" id="phone" name="phone" required>
+        </div>
+
+        <div>
+            <label for="address">Address:</label>
+            <textarea id="address" name="address" rows="4"></textarea>
+        </div>
+
+        <button type="submit">Add User</button>
+    </form>
+
+    <h2>List of Users</h2>
+
+    <?php if ($result->num_rows > 0): ?>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo $row["id"]; ?></td>
+                        <td><?php echo $row["first_name"]; ?></td>
+                        <td><?php echo $row["last_name"]; ?></td>
+                        <td><?php echo $row["email"]; ?></td>
+                        <td><?php echo $row["phone"]; ?></td>
+                        <td><?php echo $row["address"]; ?></td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    <?php else: ?>
+        <p>No users found.</p>
+    <?php endif; ?>
+</body>
+</html>
